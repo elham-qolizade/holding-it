@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Holding It — live</title>
+<title>نگه داشتم — زنده</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Handjet:wght@400;500;600;700;800&family=Fredoka:wght@700&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
@@ -283,8 +283,8 @@ const T = {
   },
 };
 
-// Language: saved choice, else the browser's. Switching reloads, so it is fixed per page load.
-let lang = navigator.language.startsWith('fa') ? 'fa' : 'en';
+// Language: saved choice, else Persian. Switching reloads, so it is fixed per page load.
+let lang = 'fa';
 try { lang = localStorage.getItem('holdingit-lang') ?? lang; } catch {}
 if (!T[lang]) lang = 'en';
 const t = T[lang];
