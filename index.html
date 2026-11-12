@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holding It — live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Handjet:wght@400;500;600;700;800&family=Fredoka:wght@700&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  /* Retro desktop look: a dithered pastel "desktop", a menu bar, cream windows with striped
+     title bars, pixel type and pixel icons. The page title alone is big, bold and cartoonish. */
+  :root {
+    color-scheme: light;
+    --desk: #ffc2d1;
+    --panel: #fff8ec;
+    --ink: #2a1a4a;
+    --muted: #6a5a80;
+    --pink: #ff9ebb;
+    --yellow: #ffd23f;
+    --teal: #3fd0bd;
+    --coral: #ff7a6b;
+    --lilac: #c3adff;
+    --mint: #c9f7e6;
+    --butter: #fff0b0;
+    --blush: #ffe0e8;
+    --green: #1f9d55;
+    --amber: #e08a00;
+    /* The Latin fonts have no Persian glyphs. Headings, numbers and buttons fall through to Handjet
+       (a pixel font); small running text uses Vazirmatn, because Handjet is too thin to read small. */
+    --pixel: 'Pixelify Sans', 'Handjet', monospace;
+    --type: 'Courier Prime', 'Vazirmatn', monospace;
+    --title: 'Fredoka', 'Vazirmatn', system-ui, sans-serif;
+  }
+  /* Persian: Courier's wide monospace space breaks up Persian words, and Handjet runs small */
+  :root:lang(fa) { --type: 'Vazirmatn', sans-serif; }
+  :lang(fa) :is(.win h2, .menubar, #title, #nudge .body, #toast) { font-size: 1.3rem; }
+  :lang(fa) .btn { font-size: 1.8rem; } :lang(fa) .btn.small { font-size: 1.35rem; }
+  :lang(fa) :is(.menubar, .tag, .total, .tile small, footer, .win h2) { letter-spacing: 0; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 0 56px; min-height: 100vh;
+    color: var(--ink); font: 1rem/1.55 var(--type);
+    background:   /* 2px checkerboard dither over a sunset gradient */
+      linear-gradient(45deg, #fff6 25%, transparent 25%, transparent 75%, #fff6 75%) 0 0 / 4px 4px,
+      linear-gradient(45deg, #fff6 25%, transparent 25%, transparent 75%, #fff6 75%) 2px 2px / 4px 4px,
+      linear-gradient(165deg, #ffb3c8 0%, #ffd3a8 55%, #a9ecdf 100%) fixed var(--desk);
+  }
+  .px svg { display: block; width: 1em; height: 1em; fill: currentColor; }
+
+  .menubar {
+    display: flex; align-items: stretch; gap: 4px; min-height: 34px; padding: 0 8px;
+    background: var(--panel); border-bottom: 2px solid var(--ink);
+    font: 600 0.94rem/1 var(--pixel); letter-spacing: .03em;
+  }
+  .menubar > * { display: flex; align-items: center; padding: 0 10px; }
+  .menubar .logo { background: var(--lilac); color: var(--ink); border-inline-end: 2px solid var(--ink); font-size: 18px; padding: 0 8px; }
+  .menubar .spacer { flex: 1; padding: 0; }
+  .menubar button { border: 0; background: none; min-height: 34px; }
+  .menubar button:hover, .menubar button:active { background: var(--ink); color: var(--panel); }
+
+  main { max-width: 500px; margin: 0 auto; padding: 28px 12px 0; display: grid; gap: 18px; }
+  header { text-align: center; }
+  h1 { font: 700 clamp(40px, 11vw, 56px)/1.2 var(--title); margin: 0; -webkit-font-smoothing: auto;
+       text-shadow: 3px 3px 0 var(--panel); }
+  h1 .hl { display: inline-block; padding: 0 .2em; background: var(--yellow); border: 3px solid var(--ink);
+           border-radius: 12px; box-shadow: 4px 4px 0 var(--ink); transform: rotate(-3deg); text-shadow: none; }
+  .how { margin: 10px auto 0; max-width: 36ch; }
+  .tag { margin: 14px 0 0; letter-spacing: .04em; text-transform: uppercase; font-size: 0.82rem; }
+
+  .win { background: var(--panel); border: 1px solid var(--ink); border-radius: 3px; box-shadow: 2px 2px 0 var(--ink); overflow: hidden; }
+  .win h2 {
+    margin: 0; padding: 4px 6px; display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--ink);
+    font: 600 0.94rem/1.2 var(--pixel); text-transform: uppercase; letter-spacing: .04em;
+  }
+  .win h2::before, .win h2::after {   /* pinstripes either side of the window title */
+    content: ''; flex: 1; height: 11px;
+    background: repeating-linear-gradient(to bottom, var(--ink) 0 1px, transparent 1px 2px);
+  }
+  .win h2 { background: var(--bar, var(--panel)); }   /* each window gets its own title-bar colour */
+  .win[aria-live] { --bar: var(--teal); } #timerBox { --bar: var(--coral); }
+  .win.day { --bar: var(--yellow); } .win.feedwin { --bar: var(--lilac); }
+  .win h2 .box { order: -1; width: 11px; height: 11px; flex: none; padding: 0; position: relative; border: 1px solid var(--ink); background: var(--panel); }
+  .win h2 .box::after { content: ''; position: absolute; inset: -16px; }   /* bigger tap target */
+  .win.shut .box { background: var(--ink); }
+  .win.shut h2 { border-bottom: 0; }
+  .win.shut > :not(h2) { display: none; }
+  .body { padding: 16px; }
+
+  .live { display: grid; grid-template-columns: 1fr 1fr; }
+  .tile { padding: 14px 16px; }
+  .tile + .tile { border-inline-start: 1px solid var(--ink); }
+  .tile b { display: block; font: 700 56px/1 var(--pixel); font-variant-numeric: tabular-nums; }
+  .tile small { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: .03em; }
+  .dot { width: 9px; height: 9px; flex: none; background: var(--c); border: 1px solid var(--ink); animation: blink 1.2s steps(2) infinite; }
+  .tile.g { --c: var(--green); background: var(--mint); } .tile.y { --c: var(--amber); background: var(--butter); }
+  @keyframes blink { 50% { background: transparent; } }
+  .total { margin: 0; padding: 8px 16px; border-top: 1px solid var(--ink); text-align: center; font-size: 0.82rem; text-transform: uppercase; letter-spacing: .03em; }
+
+  .buttons { display: grid; gap: 14px; }
+  button { font: inherit; color: var(--ink); cursor: pointer; }
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    min-height: 64px; padding: 12px 16px;
+    background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+    box-shadow: 3px 3px 0 var(--ink);
+    font: 600 1.45rem/1.2 var(--pixel);
+  }
+  #holdBtn { background: var(--yellow); } #shareBtn { background: var(--lilac); }
+  .btn.primary { background: var(--teal); box-shadow: 0 0 0 2px var(--panel), 0 0 0 4px var(--ink); margin: 4px; }
+  .btn:hover:not(:disabled) { filter: brightness(1.07) saturate(1.1); }
+  .btn:active:not(:disabled) { background: var(--ink); color: var(--panel); box-shadow: none; transform: translate(3px, 3px); }
+  .btn.primary:active:not(:disabled) { color: var(--teal); transform: none; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  #holdBtn:disabled { opacity: 1; background: var(--pink); box-shadow: none; transform: translate(3px, 3px); }
+  .btn.small { width: 100%; min-height: 46px; margin-top: 10px; font-size: 1.05rem; border-width: 1px; border-radius: 8px; box-shadow: 2px 2px 0 var(--ink); }
+  button:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
+
+  #timerBox .body { text-align: center; background: var(--blush); }
+  #timer { font: 700 68px/1 var(--pixel); font-variant-numeric: tabular-nums; }
+  #title { display: inline-block; margin: 10px 0 6px; padding: 2px 10px; background: var(--ink); color: var(--yellow); font: 600 1.05rem/1.4 var(--pixel); }
+  .muted { color: var(--muted); font-size: 0.88rem; }
+  #nudge .body { text-align: center; font: 600 1.1rem/1.4 var(--pixel); background: var(--yellow); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; border: 1px solid var(--ink); }
+  .stats > div { padding: 10px 4px; }
+  .stats > div:nth-child(1) { background: var(--mint); } .stats > div:nth-child(2) { background: var(--butter); } .stats > div:nth-child(3) { background: var(--blush); }
+  .stats > div + div { border-inline-start: 1px solid var(--ink); }
+  .stats b { display: block; font: 700 28px/1.2 var(--pixel); font-variant-numeric: tabular-nums; }
+  .stats .muted { font-size: 0.8rem; text-transform: uppercase; }
+  .remind { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 10px; cursor: pointer; }
+  .remind input { appearance: none; width: 18px; height: 18px; margin: 0; flex: none; border: 1px solid var(--ink); background-color: var(--panel); cursor: pointer; }
+  .remind input:checked {   /* classic X-in-a-box checkbox */
+    background-color: var(--teal);
+    background-image: linear-gradient(45deg, transparent 44%, var(--ink) 44% 56%, transparent 56%),
+                linear-gradient(-45deg, transparent 44%, var(--ink) 44% 56%, transparent 56%);
+  }
+
+  .feed { list-style: none; margin: 0; padding: 8px 12px; min-height: 290px; font-size: 0.95rem; }
+  .feed li { padding: 7px 6px; border-bottom: 1px dotted var(--ink); animation: slide .2s steps(3); }
+  .feed li.me { background: var(--yellow); font-weight: 600; }
+  @keyframes slide { from { opacity: 0; transform: translateY(-6px); } }
+  @media (prefers-reduced-motion: reduce) { .dot, .feed li, .bump { animation: none; } }
+  .total b { display: inline-block; }   /* inline boxes cannot be transformed, so the hop needs this */
+  .bump { animation: bump .3s steps(3); }
+  @keyframes bump { 50% { transform: translateY(-6px); } }
+  .drop { position: fixed; z-index: 5; width: 9px; height: 9px; border: 1px solid var(--ink); pointer-events: none; animation: drop .8s steps(10) forwards; }
+  @keyframes drop {
+    45% { transform: translate(calc(var(--dx) * .6), var(--dy)); }
+    100% { transform: translate(var(--dx), 90px); opacity: 0; }
+  }
+  #toast {
+    position: fixed; inset-inline: 0; bottom: 20px; width: fit-content; max-width: calc(100% - 24px); margin: 0 auto;
+    padding: 10px 16px; background: var(--ink); color: var(--yellow); border: 2px solid var(--panel);
+    box-shadow: 0 0 0 2px var(--ink); font: 600 1.05rem/1.3 var(--pixel); text-align: center;
+  }
+  footer { text-align: center; font-size: 0.84rem; text-transform: uppercase; letter-spacing: .03em; }
+</style>
+</head>
+<body>
+<nav class="menubar">
+  <span class="logo px" data-icon="toilet"></span>
+  <button id="langBtn" data-t="switchTo"></button>
+  <span class="spacer"></span>
+  <span id="date"></span>
+</nav>
+
+<main>
+  <header>
+    <h1><span data-t="h1a"></span> <span class="hl" data-t="h1b"></span></h1>
+    <p class="tag" data-t="tag"></p>
+    <p class="how" data-t="how"></p>
+  </header>
+
+  <section class="win" aria-live="polite">
+    <h2><button class="box"></button><span data-t="liveTitle"></span></h2>
+    <div class="live">
+      <div class="tile g"><b id="inToilet">–</b><small><span class="dot"></span><span data-t="inToilet"></span></small></div>
+      <div class="tile y"><b id="holding">–</b><small><span class="dot"></span><span data-t="holding"></span></small></div>
+    </div>
+    <p class="total"><b id="todayTotal">–</b> <span data-t="total"></span></p>
+  </section>
+
+  <section class="buttons">
+    <button id="holdBtn" class="btn"><span class="px" data-icon="hourglass"></span><span data-t="hold" id="holdLabel"></span></button>
+    <button id="goBtn" class="btn primary"><span class="px" data-icon="toilet"></span><span data-t="go"></span></button>
+  </section>
+
+  <section class="win" id="nudge" role="status" hidden><div class="body" data-t="nudge"></div></section>
+
+  <section class="win" id="timerBox" hidden>
+    <h2><button class="box"></button><span data-t="timerTitle"></span></h2>
+    <div class="body">
+      <div id="timer" dir="ltr"></div>
+      <div id="title"></div>
+      <div class="muted" id="others"></div>
+    </div>
+  </section>
+
+  <section class="win day">
+    <h2><button class="box"></button><span data-t="yourDay"></span></h2>
+    <div class="body">
+      <div class="stats">
+        <div><b id="sCount">0</b><span class="muted" data-t="trips"></span></div>
+        <div><b id="sGap">–</b><span class="muted" data-t="gap"></span></div>
+        <div><b id="sBest">–</b><span class="muted" data-t="best"></span></div>
+      </div>
+      <label class="remind"><input type="checkbox" id="remind"> <span data-t="remind"></span></label>
+      <button id="shareBtn" class="btn small"><span data-t="share" id="shareLabel"></span></button>
+    </div>
+  </section>
+
+  <section class="win feedwin">
+    <h2><button class="box"></button><span data-t="feedTitle"></span></h2>
+    <ul class="feed" id="feed"></ul>
+  </section>
+
+  <footer data-t="footer"></footer>
+  <div id="toast" role="status" hidden></div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const MIN = 60_000;
+const NUDGE_AFTER = 180 * MIN;
+const HOLD_EXPIRY = 180 * MIN; // a forgotten "holding" status clears itself
+const TITLE_AT = [0, 5, 15, 30, 45, 60]; // minutes at which each hold title unlocks
+
+// ---- text, per language. Strings are plain text; functions take already-formatted numbers. ----
+const T = {
+  en: {
+    dir: 'ltr', docTitle: 'Holding It — live', switchTo: 'فارسی',
+    h1a: 'Holding', h1b: 'It', tag: 'The whole world needs to pee. Live.',
+    inToilet: 'in the bathroom right now', holding: 'holding it right now',
+    total: 'bathroom trips today, worldwide',
+    nudge: '3 hours. Your bladder would like a word. 🚨',
+    hold: "I'm holding it", go: 'I went! +1',
+    yourDay: 'Your day', trips: 'trips today', gap: 'between trips', best: 'longest hold',
+    remind: "Nudge me if I haven't gone in 3 hours",
+    share: 'Share my day', copied: 'Copied!', feedTitle: 'Live feed',
+    liveTitle: 'Right now', timerTitle: 'Resisting',
+    how: 'Need to go, or just went? Tap a button.',
+    holdingNow: 'Holding…', collapse: 'Collapse window',
+    toastHold: 'Timer started. Stay strong.', toastGo: n => `Logged! Trip #${n} today.`,
+    footer: 'No sign-up. Your stats stay in this browser. · Demo data',
+    titles: ['Level: Rookie', 'Level: Committed', 'Level: Iron Bladder', 'Level: National Hero 🏅',
+             'Level: Living Legend 👑', "Okay, that's enough. Go! 🚨"],
+    others: n => `You and ${n} others are resisting right now`,
+    mins: m => `${m}m`, hours: (h, m) => `${h}h ${m}m`,
+    fHold: mine => `${mine ? 'You' : 'Someone'} started holding it ⏳`,
+    fNth: (mine, n) => `${mine ? 'You' : 'Someone'} went for the ${n}th time today 🏆`,
+    fAfter: (mine, n) => `${mine ? 'You' : 'Someone'} finally went after ${n} minutes 😅`,
+    fGo: mine => `${mine ? 'You' : 'Someone'} just went 🚽`,
+    shareText: (n, best) => `I went ${n} time${n === '1' ? '' : 's'} today`
+      + (best ? ` and held it for ${best}` : '') + '. How about you? 🚽',
+  },
+  fa: {
+    dir: 'rtl', docTitle: 'نگه داشتم — زنده', switchTo: 'English',
+    h1a: 'نگه', h1b: 'داشتم', tag: 'کل دنیا جیش داره. زنده.',
+    inToilet: 'نفر الان توی دستشویی‌ان', holding: 'نفر الان نگه داشتن',
+    total: 'بار دستشویی امروز، در کل دنیا',
+    nudge: '۳ ساعت شد. مثانه‌ات باهات حرف داره. 🚨',
+    hold: 'نگه داشتم', go: 'رفتم! ‎+۱', // LRM keeps "+۱" from flipping to "۱+" in RTL
+    yourDay: 'امروزِ تو', trips: 'بار امروز', gap: 'فاصله‌ی بین دفعات', best: 'رکورد نگه داشتن',
+    remind: 'اگه ۳ ساعت نرفتم، خبرم کن',
+    share: 'امروزم رو به اشتراک بذار', copied: 'کپی شد!', feedTitle: 'فید زنده',
+    liveTitle: 'همین الان', timerTitle: 'در حال مقاومت',
+    how: 'جیش داری یا رفتی؟ دکمه‌شو بزن.',
+    holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
+    toastHold: 'تایمر شروع شد. قوی باش.', toastGo: n => `ثبت شد! بار ${n}ام امروز.`,
+    footer: 'بدون ثبت‌نام. آمارت فقط توی همین مرورگر می‌مونه. · داده‌ی آزمایشی',
+    titles: ['سطح: تازه‌کار', 'سطح: مصمم', 'سطح: مثانه‌ی فولادی', 'سطح: قهرمان ملی 🏅',
+             'سطح: اسطوره‌ی زنده 👑', 'بسه دیگه، برو! 🚨'],
+    others: n => `تو و ${n} نفر دیگه الان در حال مقاومتید`,
+    mins: m => `${m} دق`, hours: (h, m) => `${h} س ${m} دق`,
+    fHold: mine => mine ? 'تو شروع کردی به نگه داشتن ⏳' : 'یک نفر شروع کرد به نگه داشتن ⏳',
+    fNth: (mine, n) => mine ? `تو امروز برای بار ${n}ام رفتی 🏆` : `یک نفر امروز برای بار ${n}ام رفت 🏆`,
+    fAfter: (mine, n) => mine ? `تو بعد از ${n} دقیقه بالاخره رفتی 😅` : `یک نفر بعد از ${n} دقیقه بالاخره رفت 😅`,
+    fGo: mine => mine ? 'تو همین الان رفتی 🚽' : 'یک نفر همین الان رفت 🚽',
+    shareText: (n, best) => `امروز ${n} بار رفتم دستشویی`
+      + (best ? ` و ${best} نگه داشتم` : '') + '. تو چی؟ 🚽',
+  },
+};
+
+// Language: saved choice, else the browser's. Switching reloads, so it is fixed per page load.
+let lang = navigator.language.startsWith('fa') ? 'fa' : 'en';
+try { lang = localStorage.getItem('holdingit-lang') ?? lang; } catch {}
+if (!T[lang]) lang = 'en';
+const t = T[lang];
+document.documentElement.lang = lang;
+document.documentElement.dir = t.dir;
+document.title = t.docTitle;
+for (const el of document.querySelectorAll('[data-t]')) el.textContent = t[el.dataset.t];
+$('date').textContent = new Date().toLocaleDateString(lang === 'fa' ? 'fa-IR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+// Pixel-art icons: each string is a row of the bitmap, '#' is a filled pixel.
+const ICONS = {
+  hourglass: ['#########', '.#.....#.', '.#.###.#.', '..#.#.#..', '...###...', '....#....',
+              '...#.#...', '..#...#..', '.#..#..#.', '.#.###.#.', '#########'],
+  toilet: ['.####......', '.#..#......', '.#..#......', '.#..#......', '.#..#######', '.#........#',
+           '.##......##', '..########.', '...#....#..', '...#....#..', '..########.'],
+};
+const pixelIcon = rows => `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">`
+  + rows.flatMap((row, y) => [...row].map((c, x) => c === '#' ? `<rect x="${x}" y="${y}" width="1" height="1"/>` : '')).join('')
+  + '</svg>';
+for (const el of document.querySelectorAll('[data-icon]')) el.innerHTML = pixelIcon(ICONS[el.dataset.icon]);
+
+// The box in each title bar collapses its window.
+for (const box of document.querySelectorAll('.box')) {
+  box.setAttribute('aria-label', t.collapse);
+  box.onclick = () => box.closest('.win').classList.toggle('shut');
+}
+
+$('langBtn').onclick = () => {
+  try { localStorage.setItem('holdingit-lang', lang === 'fa' ? 'en' : 'fa'); } catch {}
+  location.reload();
+};
+
+const faDigits = s => String(s).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+const num = (n, l = lang) => l === 'fa' ? faDigits(n) : String(n);
+const titleIndex = ms => TITLE_AT.findLastIndex(m => ms >= m * MIN);
+const fmtMin = (ms, l = lang) => {
+  const m = Math.round(ms / MIN);
+  return m < 60 ? T[l].mins(num(m, l)) : T[l].hours(num(Math.floor(m / 60), l), num(m % 60, l));
+};
+const avgGap = trips => trips.length < 2 ? null : (trips.at(-1) - trips[0]) / (trips.length - 1);
+
+console.assert(titleIndex(0) === 0 && titleIndex(31 * MIN) === 3 && titleIndex(999 * MIN) === 5, 'titleIndex');
+console.assert(avgGap([0, 10, 30]) === 15 && avgGap([5]) === null, 'avgGap');
+console.assert(fmtMin(42 * MIN, 'en') === '42m' && fmtMin(90 * MIN, 'en') === '1h 30m', 'fmtMin en');
+console.assert(fmtMin(90 * MIN, 'fa') === '۱ س ۳۰ دق' && num(3210, 'fa') === '۳۲۱۰', 'fmtMin fa');
+console.assert(Object.keys(T.en).join() === Object.keys(T.fa).join(), 'languages have the same keys');
+
+// ---- personal state (this browser only) ----
+const today = new Date().toDateString();
+let me = { day: today, trips: [], bestHold: 0, holdingSince: null };
+try {
+  const saved = JSON.parse(localStorage.getItem('holdingit'));
+  if (saved) me = saved.day === today ? saved : { ...saved, day: today, trips: [], bestHold: 0 };
+} catch {}
+if (me.holdingSince && Date.now() - me.holdingSince > HOLD_EXPIRY) me.holdingSince = null;
+const save = () => { try { localStorage.setItem('holdingit', JSON.stringify(me)); } catch {} };
+
+// ---- shared live state ----
+// ponytail: counts and feed are simulated in this page. Replace `publish` and the
+// simulator at the bottom with Supabase Realtime (presence + an events table).
+const world = { inToilet: 14, holding: 27, todayTotal: 3210 };
+function publish(event) { addFeed(event, true); }
+
+let toastTimer;
+function toast(text) {
+  $('toast').textContent = text;
+  $('toast').hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $('toast').hidden = true, 2200);
+}
+
+// Set a number and make it hop when it actually changed.
+function setNum(id, text) {
+  const el = $(id);
+  if (el.textContent === text) return;
+  el.textContent = text;
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); // restart the animation
+}
+
+// A burst of pixel droplets from a button.
+function splash(btn) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = btn.getBoundingClientRect();
+  for (let i = 0; i < 14; i++) {
+    const d = document.createElement('i');
+    d.className = 'drop';
+    d.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;`
+      + `--dx:${Math.random() * 260 - 130}px;--dy:${-50 - Math.random() * 110}px;`
+      + `background:${['#3fd0bd', '#5cc8ff', '#ffd23f'][i % 3]}`;
+    d.onanimationend = () => d.remove();
+    document.body.append(d);
+  }
+}
+
+function addFeed({ type, mins, nth, flag = '🫵' }, mine = false) {
+  const text = type === 'hold' ? t.fHold(mine)
+    : nth ? t.fNth(mine, num(nth))
+    : mins ? t.fAfter(mine, num(mins))
+    : t.fGo(mine);
+  const li = document.createElement('li');
+  li.textContent = `${flag} ${text}`;
+  if (mine) li.className = 'me';
+  $('feed').prepend(li);
+  while ($('feed').children.length > 8) $('feed').lastChild.remove();
+}
+
+function render() {
+  const holding = me.holdingSince !== null;
+  setNum('inToilet', num(world.inToilet));
+  setNum('holding', num(world.holding + holding));
+  setNum('todayTotal', num((world.todayTotal + me.trips.length).toLocaleString('en')));
+  $('others').textContent = t.others(num(world.holding));
+  $('timerBox').hidden = !holding;
+  $('holdBtn').disabled = holding;
+  $('holdLabel').textContent = holding ? t.holdingNow : t.hold;
+  if (holding) {
+    const ms = Date.now() - me.holdingSince;
+    if (ms > HOLD_EXPIRY) { me.holdingSince = null; save(); return render(); }
+    const s = Math.floor(ms / 1000);
+    // Latin digits in both languages: the Persian zero is a tiny dot, so ۰۰:۰۰ is hard to read as a clock
+    $('timer').textContent = [Math.floor(s / 60), s % 60].map(n => String(n).padStart(2, '0')).join(':');
+    $('title').textContent = t.titles[titleIndex(ms)];
+  }
+  // Nudge once per dry spell, counted from the last trip (or from switching the nudge on).
+  // ponytail: only fires while this tab is open, and has no quiet hours. Closed-tab
+  // reminders need Web Push + a server; add when people actually come back.
+  const since = Math.max(me.trips.at(-1) ?? 0, me.remindOn ?? 0);
+  const overdue = !!me.remind && Date.now() - since > NUDGE_AFTER;
+  $('nudge').hidden = !overdue;
+  if (overdue && me.nudgedFor !== since) {
+    me.nudgedFor = since; save();
+    if (document.hidden && window.Notification?.permission === 'granted')
+      new Notification(`${t.h1a} ${t.h1b}`, { body: t.nudge });
+  }
+  const gap = avgGap(me.trips);
+  setNum('sCount', num(me.trips.length));
+  const dur = ms => ms >= MIN ? fmtMin(ms) : '–'; // under a minute is noise, not a stat
+  $('sGap').textContent = gap === null ? '–' : dur(gap);
+  $('sBest').textContent = dur(me.bestHold);
+}
+
+$('holdBtn').onclick = () => {
+  me.holdingSince = Date.now();
+  save(); publish({ type: 'hold' }); render(); toast(t.toastHold);
+};
+$('goBtn').onclick = () => {
+  const held = me.holdingSince ? Date.now() - me.holdingSince : 0;
+  me.bestHold = Math.max(me.bestHold, held);
+  me.holdingSince = null;
+  me.trips.push(Date.now());
+  save(); publish({ type: 'go', mins: Math.floor(held / MIN) }); render(); toast(t.toastGo(num(me.trips.length))); splash($('goBtn'));
+};
+
+$('remind').checked = !!me.remind;
+$('remind').onchange = e => {
+  me.remind = e.target.checked;
+  me.remindOn = Date.now();
+  save(); render();
+  // Ask for permission only after the user opts in, never on page load.
+  if (me.remind && window.Notification?.permission === 'default') Notification.requestPermission();
+};
+
+const shareText = () => t.shareText(num(me.trips.length), me.bestHold >= MIN ? fmtMin(me.bestHold) : '');
+$('shareBtn').onclick = async () => {
+  const data = { text: shareText(), url: location.href };
+  try {
+    if (navigator.share) return await navigator.share(data);
+    await navigator.clipboard.writeText(`${data.text} ${data.url}`);
+    $('shareLabel').textContent = t.copied;
+    setTimeout(() => $('shareLabel').textContent = t.share, 1500);
+  } catch {} // user closed the share sheet, or clipboard is blocked
+};
+
+// ---- demo simulator (delete when the real backend is wired) ----
+const FLAGS = ['🇩🇪', '🇯🇵', '🇺🇸', '🇧🇷', '🇮🇳', '🇫🇷', '🇬🇧', '🇨🇦', '🇹🇷', '🇦🇺', '🇲🇽', '🇳🇱', '🇰🇷', '🇸🇪'];
+const rnd = n => Math.floor(Math.random() * n);
+function simulate() {
+  const flag = FLAGS[rnd(FLAGS.length)];
+  const roll = Math.random();
+  if (roll < 0.3) { world.holding++; addFeed({ type: 'hold', flag }); }
+  else {
+    world.todayTotal++;
+    world.inToilet = Math.max(3, world.inToilet + rnd(3) - 1);
+    if (roll < 0.6) { world.holding = Math.max(5, world.holding - 1); addFeed({ type: 'go', mins: 5 + rnd(70), flag }); }
+    else if (roll < 0.7) addFeed({ type: 'go', nth: 6 + rnd(6), flag });
+    else addFeed({ type: 'go', flag });
+  }
+  render();
+  setTimeout(simulate, 2000 + rnd(4000));
+}
+
+for (let i = 0; i < 4; i++) addFeed({ type: 'go', mins: i % 2 ? 10 + rnd(50) : 0, flag: FLAGS[rnd(FLAGS.length)] });
+render();
+setInterval(render, 1000);
+setTimeout(simulate, 2000);
+</script>
+</body>
+</html>
