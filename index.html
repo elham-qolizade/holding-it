@@ -12,7 +12,8 @@
 <meta name="apple-mobile-web-app-title" content="نگه داشتم">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Handjet:wght@400;500;600;700;800&family=Fredoka:wght@700&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Fredoka:wght@700&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Handjet:wght@400..800&amp;text=%DB%B0%DB%B1%DB%B2%DB%B3%DB%B4%DB%B5%DB%B6%DB%B7%DB%B8%DB%B9&amp;display=swap" rel="stylesheet">
 <style>
   /* Retro desktop look: a dithered pastel "desktop", a menu bar, cream windows with striped
      title bars, pixel type and pixel icons. The page title alone is big, bold and cartoonish. */
@@ -32,16 +33,18 @@
     --blush: #ffe0e8;
     --green: #1f9d55;
     --amber: #e08a00;
-    /* The Latin fonts have no Persian glyphs. Headings, numbers and buttons fall through to Handjet
-       (a pixel font); small running text uses Vazirmatn, because Handjet is too thin to read small. */
-    --pixel: 'Pixelify Sans', 'Handjet', monospace;
+    /* The Latin fonts have no Persian glyphs. Persian digits come from a digits-only Handjet (pixel)
+       subset and Persian words from Vazirmatn. Handjet's Persian letters came out with gaps between
+       them on iPhone Safari, so it is not used for words. */
+    --pixel: 'Pixelify Sans', 'Handjet', 'Vazirmatn', monospace;
     --type: 'Courier Prime', 'Vazirmatn', monospace;
     --title: 'Fredoka', 'Vazirmatn', system-ui, sans-serif;
   }
-  /* Persian: Courier's wide monospace space breaks up Persian words, and Handjet runs small */
+  /* Persian: Courier's wide monospace space breaks up Persian words */
   :root:lang(fa) { --type: 'Vazirmatn', sans-serif; }
-  :lang(fa) :is(.win h2, .menubar, #title, #nudge .body, #toast) { font-size: 1.3rem; }
-  :lang(fa) .btn { font-size: 1.8rem; } :lang(fa) .btn.small { font-size: 1.35rem; }
+  :lang(fa) :is(.win h2, .menubar) { font-size: 1.05rem; }
+  :lang(fa) :is(.win h2, .menubar, #title, #nudge .body, #toast, .breaking b, .namerow, .btn) { font-weight: 700; }
+  :lang(fa) .btn { font-size: 1.3rem; } :lang(fa) .btn.small { font-size: 1rem; }
   :lang(fa) :is(.menubar, .tag, .total, .tile small, footer, .win h2) { letter-spacing: 0; }
   * { box-sizing: border-box; }
   body {
@@ -91,7 +94,7 @@
   .breaking { padding: 14px 16px; background: var(--ink); color: var(--panel); }
   .breaking b { display: inline-block; padding: 1px 8px; margin-bottom: 8px; background: var(--yellow); color: var(--ink);
                 font: 700 0.9rem/1.5 var(--pixel); text-transform: uppercase; letter-spacing: .04em; }
-  :lang(fa) .breaking b { font-size: 1.15rem; letter-spacing: 0; }
+  :lang(fa) .breaking b { font-size: 0.95rem; letter-spacing: 0; }
   .breaking p { margin: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.6; }
   .news { list-style: none; margin: 0; padding: 6px 16px 10px; font-size: 0.95rem; }
   .news li { padding: 9px 0; border-bottom: 1px dotted var(--ink); }
@@ -115,7 +118,7 @@
   .total { margin: 0; padding: 8px 16px; border-top: 1px solid var(--ink); text-align: center; font-size: 0.82rem; text-transform: uppercase; letter-spacing: .03em; }
 
   .namerow { display: flex; align-items: center; gap: 10px; font: 600 1.05rem/1 var(--pixel); }
-  :lang(fa) .namerow { font-size: 1.3rem; }
+  :lang(fa) .namerow { font-size: 1.05rem; }
   .namerow input {
     flex: 1; min-width: 0; min-height: 44px; padding: 6px 12px;
     background: var(--panel); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px;
