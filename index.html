@@ -397,12 +397,14 @@ function renderFeed(feed) {
   const lines = feed.map(e => {
     const mine = myIds.includes(e.id);
     const li = document.createElement('li');
-    const text = e.type === 'hold' ? t.fHold(mine)
-      : e.nth >= 5 ? t.fNth(mine, lang === 'en' ? ordinal(e.nth) : num(e.nth))
-      : e.held_mins ? t.fAfter(mine, num(e.held_mins))
-      : t.fGo(mine);
-    // Other people's lines start with "Someone"; swap in their nickname when they gave one.
-    const line = !mine && e.name ? text.replace(t.someone, e.name) : text;
+    // A line with a name reads "Ali went" for everyone, its owner included (still marked 🫵);
+    // "You went" is only for the owner's own lines that have no name.
+    const you = mine && !e.name;
+    const text = e.type === 'hold' ? t.fHold(you)
+      : e.nth >= 5 ? t.fNth(you, lang === 'en' ? ordinal(e.nth) : num(e.nth))
+      : e.held_mins ? t.fAfter(you, num(e.held_mins))
+      : t.fGo(you);
+    const line = e.name ? text.replace(t.someone, e.name) : text;
     li.textContent = `${mine ? '🫵' : flagOf(e.country)} ${line}`;
     if (mine) li.classList.add('me');
     if (e.id > lastFeedId) li.classList.add('new'); // only lines that just arrived slide in
