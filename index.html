@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>نگه داشتم — زنده</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#fff8ec">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="نگه داشتم">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Handjet:wght@400;500;600;700;800&family=Fredoka:wght@700&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
@@ -56,6 +62,7 @@
   .menubar > * { display: flex; align-items: center; padding: 0 10px; }
   .menubar .logo { background: var(--lilac); color: var(--ink); border-inline-end: 2px solid var(--ink); font-size: 18px; padding: 0 8px; }
   .menubar .spacer { flex: 1; padding: 0; }
+  .menubar [hidden] { display: none; }
   .menubar button { border: 0; background: none; min-height: 34px; }
   .menubar button:hover, .menubar button:active { background: var(--ink); color: var(--panel); }
 
@@ -162,6 +169,7 @@
 <nav class="menubar">
   <span class="logo px" data-icon="toilet"></span>
   <button id="langBtn" data-t="switchTo"></button>
+  <button id="installBtn" data-t="install" hidden></button>
   <span class="spacer"></span>
   <span id="date"></span>
 </nav>
@@ -241,7 +249,7 @@ const T = {
     share: 'Share my day', copied: 'Copied!', feedTitle: 'Live feed',
     liveTitle: 'Right now', timerTitle: 'Resisting',
     how: 'Need to go, or just went? Tap a button.',
-    holdingNow: 'Holding…', collapse: 'Collapse window',
+    install: 'Install app', holdingNow: 'Holding…', collapse: 'Collapse window',
     toastHold: 'Timer started. Stay strong.', toastGo: n => `Logged! Trip #${n} today.`,
     footer: 'No sign-up. Your stats stay in this browser. · Demo data',
     titles: ['Level: Rookie', 'Level: Committed', 'Level: Iron Bladder', 'Level: National Hero 🏅',
@@ -267,7 +275,7 @@ const T = {
     share: 'امروزم رو به اشتراک بذار', copied: 'کپی شد!', feedTitle: 'فید زنده',
     liveTitle: 'همین الان', timerTitle: 'در حال مقاومت',
     how: 'جیش داری یا رفتی؟ دکمه‌شو بزن.',
-    holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
+    install: 'نصب اپ', holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
     toastHold: 'تایمر شروع شد. قوی باش.', toastGo: n => `ثبت شد! بار ${n}ام امروز.`,
     footer: 'بدون ثبت‌نام. آمارت فقط توی همین مرورگر می‌مونه. · داده‌ی آزمایشی',
     titles: ['سطح: تازه‌کار', 'سطح: مصمم', 'سطح: مثانه‌ی فولادی', 'سطح: قهرمان ملی 🏅',
@@ -416,7 +424,10 @@ function render() {
   if (overdue && me.nudgedFor !== since) {
     me.nudgedFor = since; save();
     if (document.hidden && window.Notification?.permission === 'granted')
-      new Notification(`${t.h1a} ${t.h1b}`, { body: t.nudge });
+      // Android only allows notifications through the service worker; plain Notification is the fallback.
+      (navigator.serviceWorker
+        ? navigator.serviceWorker.ready.then(reg => reg.showNotification(`${t.h1a} ${t.h1b}`, { body: t.nudge, icon: 'icon-192.png' }))
+        : Promise.resolve(new Notification(`${t.h1a} ${t.h1b}`, { body: t.nudge }))).catch(() => {});
   }
   const gap = avgGap(me.trips);
   setNum('sCount', num(me.trips.length));
@@ -455,6 +466,17 @@ $('shareBtn').onclick = async () => {
     $('shareLabel').textContent = t.copied;
     setTimeout(() => $('shareLabel').textContent = t.share, 1500);
   } catch {} // user closed the share sheet, or clipboard is blocked
+};
+
+// ---- installable app ----
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+// Chrome/Android fire this when the page can be installed; iOS has no such event (Share > Add to Home Screen).
+let installEvent;
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvent = e; $('installBtn').hidden = false; });
+$('installBtn').onclick = async () => {
+  installEvent.prompt();
+  await installEvent.userChoice;
+  $('installBtn').hidden = true;
 };
 
 // ---- demo simulator (delete when the real backend is wired) ----

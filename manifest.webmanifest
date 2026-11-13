@@ -1,0 +1,26 @@
+{
+  "name": "نگه داشتم",
+  "short_name": "نگه داشتم",
+  "description": "کل دنیا جیش داره. زنده.",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#ffc2d1",
+  "theme_color": "#fff8ec",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
