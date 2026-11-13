@@ -19,7 +19,9 @@ self.addEventListener('fetch', event => {
         if (response.ok) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(request, copy)); }
         return response;
       })
-      .catch(() => caches.match(request, { ignoreSearch: true }).then(hit => hit || caches.match('./')))
+      .catch(() => caches.match(request, { ignoreSearch: true })
+        // The cached page stands in for page loads only, never for a missing image or manifest.
+        .then(hit => hit || (request.mode === 'navigate' ? caches.match('./') : Response.error())))
   );
 });
 

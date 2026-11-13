@@ -343,12 +343,8 @@ console.assert(fmtMin(90 * MIN, 'fa') === '۱ س ۳۰ دق' && num(3210, 'fa') =
 console.assert(Object.keys(T.en).join() === Object.keys(T.fa).join(), 'languages have the same keys');
 
 // ---- personal state (this browser only) ----
-const today = new Date().toDateString();
-let me = { day: today, trips: [], bestHold: 0, holdingSince: null };
-try {
-  const saved = JSON.parse(localStorage.getItem('holdingit'));
-  if (saved) me = saved.day === today ? saved : { ...saved, day: today, trips: [], bestHold: 0 };
-} catch {}
+let me = { day: null, trips: [], bestHold: 0, holdingSince: null };
+try { me = JSON.parse(localStorage.getItem('holdingit')) ?? me; } catch {}
 if (me.holdingSince && Date.now() - me.holdingSince > HOLD_EXPIRY) me.holdingSince = null;
 const save = () => { try { localStorage.setItem('holdingit', JSON.stringify(me)); } catch {} };
 
@@ -368,7 +364,9 @@ try {
   myIds = JSON.parse(localStorage.getItem('holdingit-ids')) ?? [];
 } catch {}
 if (!session) {
-  session = crypto.randomUUID();
+  // randomUUID is missing on older Safari and outside https; build a v4 id from random bytes there.
+  session = crypto.randomUUID?.() ?? '10000000-1000-4000-8000-100000000000'.replace(/[018]/g,
+    c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
   try { localStorage.setItem('holdingit-session', session); } catch {}
 }
 
@@ -453,6 +451,9 @@ function splash(btn) {
 }
 
 function render() {
+  // New day: reset the daily stats. Checked on every render, so an app left open overnight resets too.
+  const day = new Date().toDateString();
+  if (me.day !== day) { me = { ...me, day, trips: [], bestHold: 0 }; save(); }
   const holding = me.holdingSince !== null;
   const live = n => n === null ? '–' : num(n.toLocaleString('en'));
   setNum('inToilet', live(world.inToilet));

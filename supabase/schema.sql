@@ -54,9 +54,12 @@ begin
   end if;
   select md5(v_ip || current_date::text || salt) into v_hash from private.settings;
 
-  -- Abuse limits. Per browser: the same button at most once every 20 seconds.
-  if exists (select 1 from public.events
-             where session = p_session and type = p_type and created_at > now() - interval '20 seconds') then
+  -- Abuse limits. Per browser: no repeating the same button within 20 seconds. Only the latest
+  -- event counts, so a real go -> hold -> go sequence is never refused (a refused 'go' would
+  -- leave the visitor counted as holding).
+  if exists (select 1 from (select type, created_at from public.events
+                            where session = p_session order by id desc limit 1) latest
+             where latest.type = p_type and latest.created_at > now() - interval '20 seconds') then
     raise exception 'too fast';
   end if;
   -- Per network address (skipped if the address header is missing, so one bad header cannot lock everyone out).
