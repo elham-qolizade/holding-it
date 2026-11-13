@@ -404,8 +404,20 @@ function renderFeed(feed) {
       : e.nth >= 5 ? t.fNth(you, lang === 'en' ? ordinal(e.nth) : num(e.nth))
       : e.held_mins ? t.fAfter(you, num(e.held_mins))
       : t.fGo(you);
-    const line = e.name ? text.replace(t.someone, e.name) : text;
-    li.textContent = `${mine ? '🫵' : flagOf(e.country)} ${line}`;
+    // The flag and the name each sit in their own isolated element. Flag emoji count as
+    // left-to-right text, so in the Persian layout a flag next to a Latin name would join it
+    // into one left-to-right run and end up after the name instead of before it.
+    const flag = document.createElement('bdi');
+    flag.textContent = mine ? '🫵' : flagOf(e.country);
+    li.append(flag, ' ');
+    if (e.name) {
+      const [before, ...after] = text.split(t.someone);
+      const name = document.createElement('bdi');
+      name.textContent = e.name;
+      li.append(before, name, after.join(t.someone));
+    } else {
+      li.append(text);
+    }
     if (mine) li.classList.add('me');
     if (e.id > lastFeedId) li.classList.add('new'); // only lines that just arrived slide in
     return li;
