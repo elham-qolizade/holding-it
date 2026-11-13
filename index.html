@@ -87,6 +87,15 @@
   }
   .win h2 { background: var(--bar, var(--panel)); }   /* each window gets its own title-bar colour */
   .win[aria-live] { --bar: var(--teal); } #timerBox { --bar: var(--coral); }
+  .win.newswin { --bar: var(--pink); }
+  .breaking { padding: 14px 16px; background: var(--ink); color: var(--panel); }
+  .breaking b { display: inline-block; padding: 1px 8px; margin-bottom: 8px; background: var(--yellow); color: var(--ink);
+                font: 700 0.9rem/1.5 var(--pixel); text-transform: uppercase; letter-spacing: .04em; }
+  :lang(fa) .breaking b { font-size: 1.15rem; letter-spacing: 0; }
+  .breaking p { margin: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.6; }
+  .news { list-style: none; margin: 0; padding: 6px 16px 10px; font-size: 0.95rem; }
+  .news li { padding: 9px 0; border-bottom: 1px dotted var(--ink); }
+  .news li:last-child { border-bottom: 0; }
   .win.day { --bar: var(--yellow); } .win.feedwin { --bar: var(--lilac); }
   .win h2 .box { order: -1; width: 11px; height: 11px; flex: none; padding: 0; position: relative; border: 1px solid var(--ink); background: var(--panel); }
   .win h2 .box::after { content: ''; position: absolute; inset: -16px; }   /* bigger tap target */
@@ -220,6 +229,12 @@
     </div>
   </section>
 
+  <section class="win newswin">
+    <h2><button class="box"></button><span data-t="newsTitle"></span></h2>
+    <div class="breaking"><b data-t="breaking"></b><p id="newsTop"></p></div>
+    <ul class="news" id="news"></ul>
+  </section>
+
   <section class="win day">
     <h2><button class="box"></button><span data-t="yourDay"></span></h2>
     <div class="body">
@@ -263,6 +278,23 @@ const T = {
     share: 'Share my day', copied: 'Copied!', feedTitle: 'Live feed',
     liveTitle: 'Right now', timerTitle: 'Resisting',
     how: 'Need to go, or just went? Tap a button.',
+    newsTitle: 'Pee News', breaking: 'Breaking', anon: 'An anonymous hero',
+    ranks: ['Rookie', 'Committed', 'Iron Bladder', 'National Hero', 'Living Legend', 'Bomb Squad Case'],
+    nRecord: (mins, rank) => `{who} holds today's record with ${mins} minutes of resistance. Title: ${rank}.`,
+    nHolding: mins => `Live: {who} has been holding it for ${mins} minutes. The world holds its breath.`,
+    nBusy: n => `{who} went ${n} times today. Experts: "At this point it is a lifestyle."`,
+    nCountry: (flag, n) => `${flag} is today's busiest country with ${n} trips.`,
+    nMilestone: n => `The world passed ${n} bathroom trips today. Markets did not react.`,
+    canned: [
+      'Experts call tea right before a meeting "a brave but wrong decision".',
+      'Study: the bathroom queue is always longest exactly when you are in a hurry.',
+      'Bladder spokesperson: "We issued several warnings."',
+      'Forecast: 94% chance of a bathroom trip after the second coffee.',
+      'Official statement: "I will go in five minutes" remains the biggest lie of the century.',
+      'Analysis: the person who left mid-movie missed the best scene.',
+      'Special report: the sound of running water named enemy number one of the resistance.',
+      'Markets: toilet paper shares jump after breakfast.',
+    ],
     nameLabel: 'Name', namePh: 'optional: your name or a nickname', someone: 'Someone',
     install: 'Install app', holdingNow: 'Holding…', collapse: 'Collapse window',
     toastHold: 'Timer started. Stay strong.', toastGo: n => `Logged! Trip #${n} today.`,
@@ -291,6 +323,23 @@ const T = {
     share: 'امروزم رو به اشتراک بذار', copied: 'کپی شد!', feedTitle: 'فید زنده',
     liveTitle: 'همین الان', timerTitle: 'در حال مقاومت',
     how: 'جیش داری یا رفتی؟ دکمه‌شو بزن.',
+    newsTitle: 'اخبار جیش', breaking: 'خبر فوری', anon: 'یک ناشناس',
+    ranks: ['تازه‌کار', 'مصمم', 'مثانه‌ی فولادی', 'قهرمان ملی', 'اسطوره‌ی زنده', 'خطر انفجار'],
+    nRecord: (mins, rank) => `{who} با ${mins} دقیقه مقاومت، رکورد امروز را در دست دارد. لقب: ${rank}.`,
+    nHolding: mins => `گزارش زنده: {who} همین حالا ${mins} دقیقه است که مقاومت می‌کند. جهان نفسش را حبس کرده.`,
+    nBusy: n => `{who} امروز ${n} بار رفت. کارشناسان: «این دیگر یک سبک زندگی است.»`,
+    nCountry: (flag, n) => `${flag} با ${n} بار، پرتردّدترین کشور امروز شد.`,
+    nMilestone: n => `جهان امروز از مرز ${n} بار دستشویی گذشت. بازارها واکنشی نشان ندادند.`,
+    canned: [
+      'کارشناسان: نوشیدن چای درست قبل از جلسه «تصمیمی شجاعانه ولی اشتباه» است.',
+      'پژوهش جدید: صف دستشویی همیشه دقیقاً وقتی طولانی است که عجله دارید.',
+      'سخنگوی مثانه‌ها: «ما بارها هشدار داده بودیم.»',
+      'هواشناسی: احتمال دستشویی رفتن بعد از قهوه‌ی دوم، ۹۴ درصد.',
+      'بیانیه‌ی رسمی: «پنج دقیقه‌ی دیگه می‌رم» همچنان بزرگ‌ترین دروغ قرن است.',
+      'تحلیل: آن کسی که وسط فیلم رفت، بهترین صحنه را از دست داد.',
+      'گزارش ویژه: صدای آب، دشمن شماره‌ی یک مقاومت شناخته شد.',
+      'اقتصاد: سهام دستمال توالت پس از صبحانه جهش کرد.',
+    ],
     nameLabel: 'اسم', namePh: 'اختیاری؛ اسم یا لقبت', someone: 'یک نفر',
     install: 'نصب اپ', holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
     toastHold: 'تایمر شروع شد. قوی باش.', toastGo: n => `ثبت شد! بار ${n}ام امروز.`,
@@ -429,6 +478,39 @@ function renderFeed(feed) {
   }
   $('feed').replaceChildren(...lines);
   lastFeedId = Math.max(lastFeedId, ...feed.map(e => e.id));
+}
+
+// ---- Pee News: headlines built from real numbers, padded with a few canned jokes ----
+const bdi = text => { const el = document.createElement('bdi'); el.textContent = text; return el; };
+// Put a headline into el. '{who}' becomes that person's flag and name (or "an anonymous hero"),
+// each isolated so mixed Persian/Latin text keeps its order.
+function fillLine(el, text, person) {
+  const [before, after = ''] = text.split('{who}');
+  el.replaceChildren(before);
+  if (person) el.append(bdi(flagOf(person.country)), ' ', bdi(person.name || t.anon));
+  el.append(after);
+}
+const MILESTONES = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+console.assert(MILESTONES.findLast(m => m <= 137) === 100 && MILESTONES.findLast(m => m <= 9) === undefined, 'milestone');
+
+function renderNews(n) {
+  const day = Math.floor(Date.now() / 86_400_000);          // the canned jokes rotate once a day
+  const canned = i => t.canned[(day + i) % t.canned.length];
+  const lines = [];                                          // [text, person]
+  if (n?.record) lines.push([t.nRecord(num(n.record.mins), t.ranks[titleIndex(n.record.mins * MIN)]), n.record]);
+  if (n?.holding?.mins >= 5) lines.push([t.nHolding(num(n.holding.mins)), n.holding]);
+  if (n?.busiest?.n >= 2) lines.push([t.nBusy(num(n.busiest.n)), n.busiest]);
+  if (n?.country?.n >= 2) lines.push([t.nCountry(flagOf(n.country.country), num(n.country.n))]);
+  const milestone = MILESTONES.findLast(m => m <= (n?.today ?? 0));
+  if (milestone) lines.push([t.nMilestone(num(milestone))]);
+  lines.push([canned(0)], [canned(1)]);
+  const [top, ...rest] = lines;
+  fillLine($('newsTop'), ...top);
+  $('news').replaceChildren(...rest.map(line => { const li = document.createElement('li'); fillLine(li, ...line); return li; }));
+}
+async function loadNews() {
+  try { renderNews(await rpc('news')); }
+  catch { if (!$('newsTop').textContent) renderNews(null); } // offline on first load: jokes only
 }
 
 // ponytail: polls every 5 seconds. Fine for a small crowd; move to Supabase Realtime if it gets busy.
@@ -576,6 +658,8 @@ setInterval(render, 1000);
 pulse();
 setInterval(() => { if (!document.hidden) pulse(); }, 5000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) pulse(); });
+loadNews();
+setInterval(() => { if (!document.hidden) loadNews(); }, 60_000);
 </script>
 </body>
 </html>

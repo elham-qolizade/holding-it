@@ -128,3 +128,47 @@ revoke all on function public.log_event(uuid, text, int, text) from public;
 revoke all on function public.pulse() from public;
 grant execute on function public.log_event(uuid, text, int, text) to anon, authenticated;
 grant execute on function public.pulse() to anon, authenticated;
+
+-- Facts for the "Pee News" window, all from the last 24 hours. Read-only.
+create or replace function public.news()
+returns json
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  with day as (
+    select * from public.events where created_at > now() - interval '24 hours'
+  ), who as (   -- each browser's latest name and country
+    select session,
+           (array_agg(name order by id desc) filter (where name is not null))[1] as name,
+           (array_agg(country order by id desc) filter (where country is not null))[1] as country
+    from day group by session
+  ), latest as (
+    select distinct on (session) session, type, created_at from day
+    where created_at > now() - interval '3 hours'
+    order by session, id desc
+  )
+  select json_build_object(
+    'today',   (select count(*) from day where type = 'go'),
+    -- longest hold that ended in a trip
+    'record',  (select json_build_object('name', d.name, 'country', d.country, 'mins', d.held_mins)
+                from day d where d.type = 'go' and d.held_mins > 0
+                order by d.held_mins desc, d.id limit 1),
+    -- whoever has been holding the longest right now
+    'holding', (select json_build_object('name', w.name, 'country', w.country,
+                                         'mins', floor(extract(epoch from now() - l.created_at) / 60)::int)
+                from latest l join who w using (session)
+                where l.type = 'hold' order by l.created_at limit 1),
+    'busiest', (select json_build_object('name', w.name, 'country', w.country, 'n', c.n)
+                from (select session, count(*) as n from day where type = 'go'
+                      group by session order by count(*) desc, min(id) limit 1) c
+                join who w using (session)),
+    'country', (select json_build_object('country', country, 'n', count(*))
+                from day where type = 'go' and country is not null
+                group by country order by count(*) desc, country limit 1)
+  );
+$$;
+
+revoke all on function public.news() from public;
+grant execute on function public.news() to anon, authenticated;
