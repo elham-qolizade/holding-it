@@ -99,6 +99,30 @@
   .news { list-style: none; margin: 0; padding: 6px 16px 10px; font-size: 0.95rem; }
   .news li { padding: 9px 0; border-bottom: 1px dotted var(--ink); }
   .news li:last-child { border-bottom: 0; }
+  .win.soswin { --bar: var(--coral); }
+  #sosBtn { width: 100%; background: var(--coral); }
+  #sosStatus { margin: 12px 0 0; padding: 8px 12px; border: 2px dashed var(--ink); border-radius: 8px; font-weight: 700; }
+  #sosStatus.warn { background: var(--yellow); border-style: solid; box-shadow: 2px 2px 0 var(--ink); }
+  #sosStatus.warn::before { content: '⚠️ '; }
+  #sosStatus:empty { display: none; }
+  #sosList { list-style: none; margin: 10px 0 0; padding: 0; padding-inline-end: 6px; max-height: 55vh; overflow-y: auto;
+             overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--ink) transparent; }
+  #sosList li { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 10px 0; border-top: 1px dotted var(--ink); }
+  #sosAdd { margin-top: 16px; padding-top: 8px; border-top: 1px dotted var(--ink); }
+  #sosAdd summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+  #sosAdd .fee { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0; }
+  #sosAdd .fee label { display: flex; align-items: center; gap: 6px; min-height: 36px; cursor: pointer; }
+  #sosNoteIn { width: 100%; min-height: 44px; padding: 6px 12px; background: var(--panel); color: var(--ink);
+               border: 2px solid var(--ink); border-radius: 8px; font: 1rem/1.3 var(--type); }
+  #sosNoteIn:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
+  #sosAddStatus { margin: 8px 0 0; font-weight: 700; }
+  #sosAddStatus:empty { display: none; }
+  #sosList .report { grid-column: 1; justify-self: start; min-height: 32px; padding: 0 2px; border: 0; background: none;
+                     font: inherit; font-size: 0.82rem; color: var(--muted); text-decoration: underline; }
+  #sosList li.group { display: block; border-top: 0; padding: 14px 0 2px; font-weight: 700; }
+  #sosList b { font-size: 1.02rem; }
+  #sosList .muted { grid-column: 1; }
+  #sosList a { grid-column: 2; grid-row: 1 / span 2; width: auto; margin: 0; padding: 8px 14px; text-decoration: none; color: var(--ink); background: var(--teal); }
   .win.day { --bar: var(--yellow); } .win.feedwin { --bar: var(--lilac); }
   .win h2 .box { order: -1; width: 11px; height: 11px; flex: none; padding: 0; position: relative; border: 1px solid var(--ink); background: var(--panel); }
   .win h2 .box::after { content: ''; position: absolute; inset: -16px; }   /* bigger tap target */
@@ -191,6 +215,7 @@
   <span class="logo px" data-icon="toilet"></span>
   <button id="langBtn" data-t="switchTo"></button>
   <button id="installBtn" data-t="install" hidden></button>
+  <button id="sosOpen">🚨 <span data-t="sosShort"></span></button>
   <span class="spacer"></span>
   <span id="date"></span>
 </nav>
@@ -238,6 +263,27 @@
     <ul class="news" id="news"></ul>
   </section>
 
+  <section class="win soswin shut" id="sos">
+    <h2><button class="box"></button><span data-t="sosTitle"></span></h2>
+    <div class="body">
+      <button id="sosBtn" class="btn" data-t="sosFind"></button>
+      <p id="sosStatus" role="status"></p>
+      <ul id="sosList"></ul>
+      <details id="sosAdd">
+        <summary data-t="sosAddOpen"></summary>
+        <p class="muted" data-t="sosAddNote"></p>
+        <div class="fee">
+          <label><input type="radio" name="fee" value="free"> <span data-t="sosFreeLabel"></span></label>
+          <label><input type="radio" name="fee" value="paid"> <span data-t="sosPaidLabel"></span></label>
+          <label><input type="radio" name="fee" value="unknown" checked> <span data-t="sosFeeUnknown"></span></label>
+        </div>
+        <input id="sosNoteIn" maxlength="60" autocomplete="off">
+        <button id="sosAddBtn" class="btn small" data-t="sosAddGo"></button>
+        <p id="sosAddStatus" role="status"></p>
+      </details>
+    </div>
+  </section>
+
   <section class="win day">
     <h2><button class="box"></button><span data-t="yourDay"></span></h2>
     <div class="body">
@@ -281,6 +327,23 @@ const T = {
     share: 'Share my day', copied: 'Copied!', feedTitle: 'Live feed',
     liveTitle: 'Right now', timerTitle: 'Resisting',
     how: 'Need to go, or just went? Tap a button.',
+    sosTitle: 'Emergency', sosShort: 'SOS', sosFind: 'Find the nearest toilet',
+    sosLocating: 'Getting your location…', sosSearching: 'Searching nearby…',
+    sosDenied: 'Location was blocked. Allow it for this site and try again.',
+    sosNoGeo: 'This browser cannot share a location.', sosError: 'The map service did not answer. Try again in a moment.',
+    sosNone: 'Nothing found nearby. Good luck.', sosPartial: 'Some searches did not answer, so the list may be incomplete.', sosWider: 'Nothing very close, so I searched a wider area.', sosMapped: 'Mapped public toilets:', sosNoMapped: 'No public toilet is mapped nearby.',
+    sosLikely: 'Places that often have a toilet (not guaranteed):',
+    sosToilet: 'Public toilet', sosFee: 'paid', sosFree: 'free', sosGo: 'Take me',
+    sosAddOpen: '➕ Is there a public toilet here? Add it',
+    sosAddNote: 'It is saved where you are standing and shown to everyone nearby. Public places only, not homes or private spots.',
+    sosFreeLabel: 'Free', sosPaidLabel: 'Paid', sosFeeUnknown: 'Not sure',
+    sosNotePh: 'Short note, optional (e.g. next to the mosque)', sosAddGo: 'Add this place',
+    sosAdding: 'Getting your location…', sosAdded: 'Added. Thank you!',
+    sosAddAlready: 'You already added this place.', sosAddLimit: "You've added a lot today. Try again tomorrow.",
+    sosAddError: 'Could not add it. Try again in a moment.',
+    sosCommunity: 'added by visitors', sosConfirms: n => `confirmed by ${n}`, sosReport: 'Wrong?', sosReported: 'Reported',
+    sosKinds: { fuel: 'Petrol station', mosque: 'Mosque / prayer room', worship: 'Place of worship', hospital: 'Hospital', clinic: 'Clinic' },
+    metres: n => `${n} m`, kms: n => `${n} km`,
     newsTitle: 'Pee News', breaking: 'Breaking', anon: 'An anonymous hero',
     ranks: ['Rookie', 'Committed', 'Iron Bladder', 'National Hero', 'Living Legend', 'Bomb Squad Case'],
     nRecord: (mins, rank) => `{who} holds today's record with ${mins} minutes of resistance. Title: ${rank}.`,
@@ -326,6 +389,23 @@ const T = {
     share: 'امروزم رو به اشتراک بذار', copied: 'کپی شد!', feedTitle: 'فید زنده',
     liveTitle: 'همین الان', timerTitle: 'در حال مقاومت',
     how: 'جیش داری یا رفتی؟ دکمه‌شو بزن.',
+    sosTitle: 'اورژانسی', sosShort: 'اورژانسی', sosFind: 'نزدیک‌ترین دستشویی رو پیدا کن',
+    sosLocating: 'در حال گرفتن موقعیت…', sosSearching: 'در حال گشتن اطراف…',
+    sosDenied: 'دسترسی به موقعیت بسته‌ست. برای این سایت بازش کن و دوباره بزن.',
+    sosNoGeo: 'این مرورگر نمی‌تونه موقعیت بده.', sosError: 'سرویس نقشه جواب نداد. چند لحظه‌ی دیگه دوباره بزن.',
+    sosNone: 'این اطراف چیزی پیدا نشد. موفق باشی.', sosPartial: 'بعضی جستجوها جواب ندادن؛ ممکنه فهرست کامل نباشه.', sosWider: 'نزدیکی چیزی نبود، پس دورتر هم گشتم.', sosMapped: 'دستشویی‌های عمومیِ ثبت‌شده:', sosNoMapped: 'دستشویی عمومیِ ثبت‌شده‌ای این نزدیکی نیست.',
+    sosLikely: 'جاهایی که معمولاً دستشویی دارن (تضمینی نیست):',
+    sosToilet: 'دستشویی عمومی', sosFee: 'پولی', sosFree: 'رایگان', sosGo: 'ببر منو',
+    sosAddOpen: '➕ اینجا دستشویی عمومی هست؟ ثبتش کن',
+    sosAddNote: 'همین‌جایی که ایستادی ثبت می‌شه و برای همه‌ی آدم‌های اطراف نشون داده می‌شه. فقط جاهای عمومی؛ نه خونه و جای شخصی.',
+    sosFreeLabel: 'رایگان', sosPaidLabel: 'پولی', sosFeeUnknown: 'نمی‌دونم',
+    sosNotePh: 'توضیح کوتاه، اختیاری (مثلاً: کنار مسجد)', sosAddGo: 'ثبت این‌جا',
+    sosAdding: 'در حال گرفتن موقعیت…', sosAdded: 'ثبت شد. ممنون!',
+    sosAddAlready: 'این‌جا رو قبلاً ثبت کردی.', sosAddLimit: 'امروز زیاد ثبت کردی. فردا دوباره امتحان کن.',
+    sosAddError: 'ثبت نشد. چند لحظه‌ی دیگه دوباره بزن.',
+    sosCommunity: 'ثبت‌شده توسط کاربرها', sosConfirms: n => `تأیید ${n} نفر`, sosReport: 'اشتباهه؟', sosReported: 'گزارش شد',
+    sosKinds: { fuel: 'پمپ‌بنزین', mosque: 'مسجد / نمازخانه', worship: 'عبادتگاه', hospital: 'بیمارستان', clinic: 'درمانگاه / کلینیک' },
+    metres: n => `${n} متر`, kms: n => `${n} کیلومتر`,
     newsTitle: 'اخبار جیش', breaking: 'خبر فوری', anon: 'یک ناشناس',
     ranks: ['تازه‌کار', 'مصمم', 'مثانه‌ی فولادی', 'قهرمان ملی', 'اسطوره‌ی زنده', 'خطر انفجار'],
     nRecord: (mins, rank) => `{who} با ${mins} دقیقه مقاومت، رکورد امروز را در دست دارد. لقب: ${rank}.`,
@@ -422,7 +502,11 @@ const API = 'https://qpaastiurmstbmzcjcvo.supabase.co/rest/v1/rpc/';
 const API_KEY = 'sb_publishable_rGOhLBbGZ7ET96mKtJKfGQ_U_wiXuTB';
 const rpc = (fn, args = {}) =>
   fetch(API + fn, { method: 'POST', headers: { apikey: API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(args) })
-    .then(r => r.ok ? r.json() : Promise.reject(new Error(`${fn}: ${r.status}`)));
+    .then(async r => {
+      if (r.ok) return r.status === 204 ? null : r.json();   // functions that return nothing answer 204
+      const body = await r.json().catch(() => ({}));
+      throw new Error(body.message || `${fn}: ${r.status}`);   // e.g. "daily limit", "already"
+    });
 
 // A random id for this browser, and the ids of events it sent (to mark "you" in the feed).
 let session = null, myIds = [];
@@ -515,6 +599,184 @@ async function loadNews() {
   try { renderNews(await rpc('news')); }
   catch { if (!$('newsTop').textContent) renderNews(null); } // offline on first load: jokes only
 }
+
+// ---- Emergency finder: nearby places from OpenStreetMap (Nominatim search, no key) ----
+// One category at a time, nearest toilets first, because Nominatim asks for at most one request per
+// second. Overpass would be a single query, but its public servers did not answer from phones.
+// ponytail: fine for a small crowd; Nominatim's usage policy rules out heavy traffic. If this grows,
+// move to a self-hosted or paid map API.
+// q is what Nominatim is asked; types keeps only the real thing (the query "mosque" matched bus stops
+// that have "Mosque" in their name, while "place of worship" finds the actual buildings).
+// The order here is also the order of the list: results arrive one kind at a time and each kind is shown
+// as soon as it arrives, so the list only ever grows at the end and nothing jumps around while it loads.
+const SEARCHES = [
+  { kind: 'toilet', q: 'toilets', types: ['toilets'], radius: 1500, limit: 40 },
+  { kind: 'worship', q: 'place of worship', types: ['place_of_worship'], radius: 800, limit: 40 },
+  { kind: 'fuel', q: 'petrol station', types: ['fuel'], radius: 800, limit: 40 },
+  { kind: 'hospital', q: 'hospital', types: ['hospital'], radius: 1500, limit: 40 },
+  { kind: 'clinic', q: 'clinic', types: ['clinic'], radius: 800, limit: 40 },
+];
+
+// Distance in metres between two [lat, lon] points (haversine).
+function metres([lat1, lon1], [lat2, lon2]) {
+  const rad = d => d * Math.PI / 180;
+  const a = Math.sin(rad(lat2 - lat1) / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(rad(lon2 - lon1) / 2) ** 2;
+  return 2 * 6_371_000 * Math.asin(Math.sqrt(a));
+}
+console.assert(Math.abs(metres([52.52, 13.405], [52.53, 13.405]) - 1112) < 3, 'metres');
+// The same real place can come back twice (a building and a point mapped for it). Two results of one kind
+// are the same place when they are within 15 m, or within 80 m and have the same name.
+const sameSpot = (a, b) => a.kind === b.kind && metres(a.pos, b.pos) < (a.name && a.name === b.name ? 80 : 15);
+console.assert(sameSpot({ kind: 'worship', name: 'X', pos: [35, 51] }, { kind: 'worship', name: 'X', pos: [35.0004, 51] })
+  && !sameSpot({ kind: 'worship', name: 'X', pos: [35, 51] }, { kind: 'fuel', name: 'X', pos: [35, 51] })
+  && !sameSpot({ kind: 'worship', name: '', pos: [35, 51] }, { kind: 'worship', name: '', pos: [35.001, 51] }), 'sameSpot');
+const fmtDist = m => m < 950 ? t.metres(num(Math.max(10, Math.round(m / 10) * 10))) : t.kms(num((m / 1000).toFixed(1)));
+
+async function search({ q, types, radius, limit }, lat, lon) {
+  // Only a box around the position, rounded to about 100 m, leaves the device. Distances use the exact position.
+  const [clat, clon] = [lat.toFixed(3), lon.toFixed(3)].map(Number);
+  const dLat = radius / 111_320, dLon = dLat / Math.cos(clat * Math.PI / 180);
+  const r = await fetch('https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+    format: 'jsonv2', q, bounded: '1', limit, extratags: '1',
+    viewbox: [clon - dLon, clat + dLat, clon + dLon, clat - dLat].join(','),   // left, top, right, bottom
+  }), { signal: AbortSignal.timeout(10_000) });
+  if (!r.ok) throw new Error(`nominatim: ${r.status}`);
+  return (await r.json())
+    // Churches and temples rarely have a public toilet; mosques do. Places with no religion tag stay.
+    .filter(x => types.includes(x.type) && (!x.extratags?.religion || x.extratags.religion === 'muslim'))
+    .map(x => ({ name: x.name || '', tags: x.extratags ?? {}, pos: [+x.lat, +x.lon], dist: metres([lat, lon], [+x.lat, +x.lon]) }))
+    .sort((a, b) => a.dist - b.dist);
+}
+
+function placeRow({ kind, name, tags, pos, dist, community }) {
+  const label = kind === 'toilet' ? t.sosToilet : kind === 'worship' ? (tags.religion === 'muslim' ? t.sosKinds.mosque : t.sosKinds.worship) : t.sosKinds[kind];
+  const li = document.createElement('li');
+  const title = document.createElement('b');
+  title.append(bdi(name || label));
+  const meta = document.createElement('span');
+  meta.className = 'muted';
+  meta.textContent = [
+    fmtDist(dist),
+    name ? label : null,
+    community ? t.sosCommunity : null,
+    community?.confirms > 1 ? t.sosConfirms(num(community.confirms)) : null,
+    tags.fee === 'yes' ? t.sosFee : tags.fee === 'no' ? t.sosFree : null,
+    tags.wheelchair === 'yes' ? '♿' : null,
+  ].filter(Boolean).join(' · ');
+  const go = document.createElement('a');   // hands the route to the phone's own maps app
+  go.className = 'btn small';
+  go.href = `https://www.google.com/maps/dir/?api=1&destination=${pos[0]},${pos[1]}&travelmode=walking`;
+  go.target = '_blank';
+  go.rel = 'noopener';
+  go.textContent = t.sosGo;
+  li.append(title, go, meta);
+  if (community) {   // anyone can flag a wrong place; three different browsers hide it
+    const report = document.createElement('button');
+    report.className = 'report';
+    report.textContent = t.sosReport;
+    report.onclick = () => {
+      rpc('report_place', { p_session: session, p_id: community.id }).catch(() => {});
+      report.textContent = t.sosReported;
+      report.disabled = true;
+    };
+    li.append(report);
+  }
+  return li;
+}
+
+function setStatus(text, warn = false) {
+  $('sosStatus').textContent = text;
+  $('sosStatus').classList.toggle('warn', warn && !!text);
+}
+
+// found: places so far (each with its kind); done: every search has finished; failed: kinds whose search errored;
+// widened: nothing was close by, so a bigger area was searched; where: the searched position, rounded, for the "nothing" message.
+function showPlaces(found, done, failed, widened, where) {
+  const heading = text => { const li = document.createElement('li'); li.className = 'group'; li.textContent = text; return li; };
+  const toilets = found.filter(p => p.kind === 'toilet').sort((a, b) => a.dist - b.dist).slice(0, 5);
+  // The two nearest of each kind, kinds in search order, so the many clinics do not crowd out the rest.
+  const likely = SEARCHES.map(s => s.kind).filter(k => k !== 'toilet')
+    .flatMap(k => found.filter(p => p.kind === k).sort((a, b) => a.dist - b.dist).slice(0, 2));
+  // Notices that need your attention (nothing mapped, an error, no permission) get a yellow box; progress stays quiet.
+  let [message, warn] = !done ? [t.sosSearching, false]
+    : failed.includes('toilet') && !toilets.length ? [t.sosError, true]
+    : !found.length ? [`${t.sosNone} (${where})`, true]
+    : !toilets.length ? [t.sosNoMapped, true]
+    : failed.length ? [t.sosPartial, true]   // some kinds did not answer, so something may be missing
+    : widened && !toilets.some(p => p.dist <= SEARCHES[0].radius) ? [t.sosWider, false]   // only when no toilet is close
+    : ['', false];
+  if (done && failed.length && message && message !== t.sosPartial && message !== t.sosError) message += ' ' + t.sosPartial;   // say so when part of the search failed
+  setStatus(message, warn);
+  $('sosList').replaceChildren(
+    ...(toilets.length ? [heading(t.sosMapped), ...toilets.map(placeRow)] : []),
+    ...(likely.length ? [heading(t.sosLikely), ...likely.map(placeRow)] : []));
+}
+
+$('sosBtn').onclick = () => {
+  $('sosList').replaceChildren();
+  if (!navigator.geolocation) { setStatus(t.sosNoGeo, true); return; }
+  setStatus(t.sosLocating);
+  navigator.geolocation.getCurrentPosition(async ({ coords: { latitude, longitude } }) => {
+    setStatus(t.sosSearching);
+    const where = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+    const found = [], failed = new Set(), have = new Set();
+    let widened = false, requests = 0;
+    // Places visitors added come from our own database, so they show up right away.
+    try {
+      const mine = await rpc('places_near', { p_lat: latitude, p_lon: longitude, p_radius: 5000 });
+      found.push(...mine.map(r => ({
+        kind: 'toilet', name: r.note || '', pos: [r.lat, r.lon], dist: metres([latitude, longitude], [r.lat, r.lon]),
+        tags: { fee: r.fee === 'free' ? 'no' : r.fee === 'paid' ? 'yes' : undefined },
+        community: { id: r.id, confirms: r.confirms },
+      })));
+      if (found.length) showPlaces(found, false, [], false, where);
+    } catch {}   // our database being unreachable must not stop the map search
+    for (const scale of [1, 3]) {   // second round: a 3x bigger area, only for categories that found nothing
+      const todo = SEARCHES.filter(s => !have.has(s.kind));
+      widened ||= scale > 1 && todo.length > 0;
+      for (const s of todo) {
+        if (requests++) await new Promise(r => setTimeout(r, 1100));   // at most one Nominatim request per second
+        try {
+          const places = await search({ ...s, radius: s.radius * scale }, latitude, longitude);
+          failed.delete(s.kind);
+          if (places.length) have.add(s.kind);
+          for (const p of places.map(q => ({ ...q, kind: s.kind }))) if (!found.some(f => sameSpot(f, p))) found.push(p);
+        } catch { failed.add(s.kind); }
+        showPlaces(found, false, [...failed], widened, where);   // show each category as soon as it arrives
+      }
+    }
+    showPlaces(found, true, [...failed], widened, where);
+  }, () => { setStatus(t.sosDenied, true); },
+  { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 });
+};
+$('sosNoteIn').placeholder = t.sosNotePh;
+$('sosAddBtn').onclick = () => {
+  const status = $('sosAddStatus');
+  if (!navigator.geolocation) { status.textContent = t.sosNoGeo; return; }
+  status.textContent = t.sosAdding;
+  $('sosAddBtn').disabled = true;
+  navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+    try {
+      await rpc('add_place', {
+        p_session: session, p_lat: coords.latitude, p_lon: coords.longitude,
+        p_fee: document.querySelector('input[name=fee]:checked').value, p_note: $('sosNoteIn').value.trim() || null,
+      });
+      status.textContent = t.sosAdded;
+      $('sosNoteIn').value = '';
+    } catch (e) {
+      status.textContent = /already/.test(e.message) ? t.sosAddAlready : /limit/.test(e.message) ? t.sosAddLimit : t.sosAddError;
+    }
+    $('sosAddBtn').disabled = false;
+  }, () => { status.textContent = t.sosDenied; $('sosAddBtn').disabled = false; },
+  { enableHighAccuracy: true, timeout: 10_000 });
+};
+
+// The menu-bar button opens the (normally collapsed) window and starts the search in one tap.
+$('sosOpen').onclick = () => {
+  $('sos').classList.remove('shut');
+  $('sos').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  $('sosBtn').click();
+};
 
 // ponytail: polls every 5 seconds. Fine for a small crowd; move to Supabase Realtime if it gets busy.
 async function pulse() {

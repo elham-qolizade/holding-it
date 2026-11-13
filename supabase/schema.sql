@@ -172,3 +172,124 @@ $$;
 
 revoke all on function public.news() from public;
 grant execute on function public.news() to anon, authenticated;
+
+-- Community toilets: places that visitors add from the emergency window. Shown to everyone nearby.
+-- Same design as events: the table is closed, the browser can only call the functions below.
+-- ponytail: confirmations count sessions, so someone with many browsers can inflate them; moderation is
+-- three reports from different browsers hiding a place, and deleting rows by hand in the dashboard.
+create table if not exists public.places (
+  id          bigint generated always as identity primary key,
+  lat         double precision not null check (lat between -90 and 90),
+  lon         double precision not null check (lon between -180 and 180),
+  fee         text not null default 'unknown' check (fee in ('free', 'paid', 'unknown')),
+  note        text,
+  country     text,
+  by_sessions uuid[] not null,                 -- browsers that added or confirmed it; the first one added it
+  reported_by uuid[] not null default '{}',
+  hidden      boolean not null default false,  -- three different reports hide a place
+  ip_hash     text not null,                   -- salted and changes daily; used only for rate limits
+  created_at  timestamptz not null default now()
+);
+create index if not exists places_pos_idx on public.places (lat, lon);
+alter table public.places enable row level security;
+revoke all on table public.places from anon, authenticated;
+
+create or replace function public.add_place(p_session uuid, p_lat double precision, p_lon double precision,
+                                            p_fee text default 'unknown', p_note text default null)
+returns bigint
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  h         json := coalesce(nullif(current_setting('request.headers', true), ''), '{}')::json;
+  v_ip      text := trim(split_part(coalesce(h->>'cf-connecting-ip', h->>'x-real-ip', h->>'x-forwarded-for', ''), ',', 1));
+  v_country text := upper(coalesce(h->>'cf-ipcountry', ''));
+  v_hash    text;
+  v_lat     double precision;
+  v_lon     double precision;
+  v_note    text := nullif(left(btrim(regexp_replace(regexp_replace(coalesce(p_note, ''), '[[:cntrl:]]', '', 'g'), '\s+', ' ', 'g')), 60), '');
+  v_near    public.places%rowtype;
+  v_id      bigint;
+begin
+  if p_session is null or p_lat is null or p_lon is null or p_lat not between -90 and 90 or p_lon not between -180 and 180 then
+    raise exception 'bad position';
+  end if;
+  if p_fee not in ('free', 'paid', 'unknown') then
+    raise exception 'bad fee';
+  end if;
+  if v_country !~ '^[A-Z]{2}$' or v_country in ('XX', 'T1') then
+    v_country := null;
+  end if;
+  v_lat := round(p_lat::numeric, 4);   -- about 11 m: enough to find the place, not to pin down a person
+  v_lon := round(p_lon::numeric, 4);
+  select md5(v_ip || current_date::text || salt) into v_hash from private.settings;
+
+  -- Limits: 5 new places a day per browser, 10 per network address.
+  if (select count(*) from public.places where by_sessions[1] = p_session and created_at > now() - interval '1 day') >= 5 then
+    raise exception 'daily limit';
+  end if;
+  if v_ip <> '' and (select count(*) from public.places where ip_hash = v_hash and created_at > now() - interval '1 day') >= 10 then
+    raise exception 'daily limit';
+  end if;
+
+  -- Something is already listed within about 40 m: confirm it instead of adding a duplicate.
+  select * into v_near from public.places
+  where lat between v_lat - 0.0005 and v_lat + 0.0005
+    and lon between v_lon - 0.0005 / greatest(cos(radians(v_lat)), 0.05) and v_lon + 0.0005 / greatest(cos(radians(v_lat)), 0.05)
+    and 111320 * sqrt(power(lat - v_lat, 2) + power((lon - v_lon) * cos(radians(v_lat)), 2)) <= 40
+  order by id limit 1;
+  if found then
+    if v_near.hidden then raise exception 'hidden'; end if;
+    if p_session = any(v_near.by_sessions) then raise exception 'already'; end if;
+    update public.places set by_sessions = by_sessions || p_session,
+                             fee = case when fee = 'unknown' then p_fee else fee end,
+                             note = coalesce(note, v_note)
+    where id = v_near.id;
+    return v_near.id;
+  end if;
+
+  insert into public.places (lat, lon, fee, note, country, by_sessions, ip_hash)
+  values (v_lat, v_lon, p_fee, v_note, v_country, array[p_session], v_hash)
+  returning id into v_id;
+  return v_id;
+end $$;
+
+create or replace function public.places_near(p_lat double precision, p_lon double precision, p_radius int default 5000)
+returns json
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(json_agg(x order by x.dist), '[]'::json) from (
+    select p.id, p.lat, p.lon, p.fee, p.note, cardinality(p.by_sessions) as confirms, d.dist
+    from public.places p
+    cross join lateral (select 111320 * sqrt(power(p.lat - p_lat, 2) + power((p.lon - p_lon) * cos(radians(p_lat)), 2)) as dist) d
+    where not p.hidden
+      and p.lat between p_lat - 0.15 and p_lat + 0.15
+      and p.lon between p_lon - 0.3 and p_lon + 0.3
+      and d.dist <= least(greatest(coalesce(p_radius, 5000), 100), 15000)
+    order by d.dist
+    limit 20
+  ) x;
+$$;
+
+create or replace function public.report_place(p_session uuid, p_id bigint)
+returns void
+language sql
+security definer
+set search_path = ''
+as $$
+  update public.places
+  set reported_by = reported_by || p_session,
+      hidden = hidden or cardinality(reported_by) + 1 >= 3
+  where id = p_id and p_session is not null and not (p_session = any(reported_by));
+$$;
+
+revoke all on function public.add_place(uuid, double precision, double precision, text, text) from public;
+revoke all on function public.places_near(double precision, double precision, int) from public;
+revoke all on function public.report_place(uuid, bigint) from public;
+grant execute on function public.add_place(uuid, double precision, double precision, text, text) to anon, authenticated;
+grant execute on function public.places_near(double precision, double precision, int) to anon, authenticated;
+grant execute on function public.report_place(uuid, bigint) to anon, authenticated;
