@@ -145,7 +145,8 @@
   }
 
   .feed { list-style: none; margin: 0; padding: 8px 12px; min-height: 290px; font-size: 0.95rem; }
-  .feed li { padding: 7px 6px; border-bottom: 1px dotted var(--ink); animation: slide .2s steps(3); }
+  .feed li { padding: 7px 6px; border-bottom: 1px dotted var(--ink); }
+  .feed li.new { animation: slide .2s steps(3); }
   .feed li.me { background: var(--yellow); font-weight: 600; }
   @keyframes slide { from { opacity: 0; transform: translateY(-6px); } }
   @media (prefers-reduced-motion: reduce) { .dot, .feed li, .bump { animation: none; } }
@@ -251,13 +252,14 @@ const T = {
     how: 'Need to go, or just went? Tap a button.',
     install: 'Install app', holdingNow: 'Holding…', collapse: 'Collapse window',
     toastHold: 'Timer started. Stay strong.', toastGo: n => `Logged! Trip #${n} today.`,
-    footer: 'No sign-up. Your stats stay in this browser. · Demo data',
+    footer: 'No sign-up. Your stats stay in this browser.',
+    feedEmpty: 'Nobody yet. Be the first.',
     titles: ['Level: Rookie', 'Level: Committed', 'Level: Iron Bladder', 'Level: National Hero 🏅',
              'Level: Living Legend 👑', "Okay, that's enough. Go! 🚨"],
     others: n => `You and ${n} others are resisting right now`,
     mins: m => `${m}m`, hours: (h, m) => `${h}h ${m}m`,
     fHold: mine => `${mine ? 'You' : 'Someone'} started holding it ⏳`,
-    fNth: (mine, n) => `${mine ? 'You' : 'Someone'} went for the ${n}th time today 🏆`,
+    fNth: (mine, n) => `${mine ? 'You' : 'Someone'} went for the ${n} time today 🏆`,
     fAfter: (mine, n) => `${mine ? 'You' : 'Someone'} finally went after ${n} minutes 😅`,
     fGo: mine => `${mine ? 'You' : 'Someone'} just went 🚽`,
     shareText: (n, best) => `I went ${n} time${n === '1' ? '' : 's'} today`
@@ -277,7 +279,8 @@ const T = {
     how: 'جیش داری یا رفتی؟ دکمه‌شو بزن.',
     install: 'نصب اپ', holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
     toastHold: 'تایمر شروع شد. قوی باش.', toastGo: n => `ثبت شد! بار ${n}ام امروز.`,
-    footer: 'بدون ثبت‌نام. آمارت فقط توی همین مرورگر می‌مونه. · داده‌ی آزمایشی',
+    footer: 'بدون ثبت‌نام. آمارت فقط توی همین مرورگر می‌مونه.',
+    feedEmpty: 'هنوز کسی نیست. اولین نفر باش.',
     titles: ['سطح: تازه‌کار', 'سطح: مصمم', 'سطح: مثانه‌ی فولادی', 'سطح: قهرمان ملی 🏅',
              'سطح: اسطوره‌ی زنده 👑', 'بسه دیگه، برو! 🚨'],
     others: n => `تو و ${n} نفر دیگه الان در حال مقاومتید`,
@@ -349,11 +352,74 @@ try {
 if (me.holdingSince && Date.now() - me.holdingSince > HOLD_EXPIRY) me.holdingSince = null;
 const save = () => { try { localStorage.setItem('holdingit', JSON.stringify(me)); } catch {} };
 
-// ---- shared live state ----
-// ponytail: counts and feed are simulated in this page. Replace `publish` and the
-// simulator at the bottom with Supabase Realtime (presence + an events table).
-const world = { inToilet: 14, holding: 27, todayTotal: 3210 };
-function publish(event) { addFeed(event, true); }
+// ---- shared live state (Supabase) ----
+// The key is public by design: the database refuses direct table access and only lets it
+// call two functions, log_event and pulse (see supabase/schema.sql).
+const API = 'https://qpaastiurmstbmzcjcvo.supabase.co/rest/v1/rpc/';
+const API_KEY = 'sb_publishable_rGOhLBbGZ7ET96mKtJKfGQ_U_wiXuTB';
+const rpc = (fn, args = {}) =>
+  fetch(API + fn, { method: 'POST', headers: { apikey: API_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(args) })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(`${fn}: ${r.status}`)));
+
+// A random id for this browser, and the ids of events it sent (to mark "you" in the feed).
+let session = null, myIds = [];
+try {
+  session = localStorage.getItem('holdingit-session');
+  myIds = JSON.parse(localStorage.getItem('holdingit-ids')) ?? [];
+} catch {}
+if (!session) {
+  session = crypto.randomUUID();
+  try { localStorage.setItem('holdingit-session', session); } catch {}
+}
+
+let world = { inToilet: null, holding: null, todayTotal: null }; // null until the first answer arrives
+let lastFeedId = 0;
+
+const flagOf = code => code ? String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)) : '🌍';
+const ordinal = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th', 'st', 'nd', 'rd'][n % 100] || 'th');
+console.assert([1, 2, 3, 4, 11, 12, 13, 21, 22, 101, 111].map(ordinal).join() === '1st,2nd,3rd,4th,11th,12th,13th,21st,22nd,101st,111th', 'ordinal');
+console.assert(flagOf('DE') === '🇩🇪' && flagOf(null) === '🌍', 'flagOf');
+
+function renderFeed(feed) {
+  const lines = feed.map(e => {
+    const mine = myIds.includes(e.id);
+    const li = document.createElement('li');
+    const text = e.type === 'hold' ? t.fHold(mine)
+      : e.nth >= 5 ? t.fNth(mine, lang === 'en' ? ordinal(e.nth) : num(e.nth))
+      : e.held_mins ? t.fAfter(mine, num(e.held_mins))
+      : t.fGo(mine);
+    li.textContent = `${mine ? '🫵' : flagOf(e.country)} ${text}`;
+    if (mine) li.classList.add('me');
+    if (e.id > lastFeedId) li.classList.add('new'); // only lines that just arrived slide in
+    return li;
+  });
+  if (!lines.length) {
+    const li = document.createElement('li');
+    li.textContent = t.feedEmpty;
+    lines.push(li);
+  }
+  $('feed').replaceChildren(...lines);
+  lastFeedId = Math.max(lastFeedId, ...feed.map(e => e.id));
+}
+
+// ponytail: polls every 5 seconds. Fine for a small crowd; move to Supabase Realtime if it gets busy.
+async function pulse() {
+  try {
+    const p = await rpc('pulse');
+    world = { inToilet: p.in_toilet, holding: p.holding, todayTotal: p.today };
+    renderFeed(p.feed);
+    render();
+  } catch {} // offline: keep showing the last known numbers
+}
+
+async function publish(type, heldMins = 0) {
+  try {
+    const id = await rpc('log_event', { p_session: session, p_type: type, p_held_mins: heldMins });
+    myIds = [...myIds, id].slice(-30);
+    try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
+  } catch {} // offline or rate limited: the personal stats above still count on this device
+  pulse();
+}
 
 let toastTimer;
 function toast(text) {
@@ -386,24 +452,13 @@ function splash(btn) {
   }
 }
 
-function addFeed({ type, mins, nth, flag = '🫵' }, mine = false) {
-  const text = type === 'hold' ? t.fHold(mine)
-    : nth ? t.fNth(mine, num(nth))
-    : mins ? t.fAfter(mine, num(mins))
-    : t.fGo(mine);
-  const li = document.createElement('li');
-  li.textContent = `${flag} ${text}`;
-  if (mine) li.className = 'me';
-  $('feed').prepend(li);
-  while ($('feed').children.length > 8) $('feed').lastChild.remove();
-}
-
 function render() {
   const holding = me.holdingSince !== null;
-  setNum('inToilet', num(world.inToilet));
-  setNum('holding', num(world.holding + holding));
-  setNum('todayTotal', num((world.todayTotal + me.trips.length).toLocaleString('en')));
-  $('others').textContent = t.others(num(world.holding));
+  const live = n => n === null ? '–' : num(n.toLocaleString('en'));
+  setNum('inToilet', live(world.inToilet));
+  setNum('holding', live(world.holding));
+  setNum('todayTotal', live(world.todayTotal));
+  $('others').textContent = t.others(num(Math.max(0, (world.holding ?? 1) - 1)));
   $('timerBox').hidden = !holding;
   $('holdBtn').disabled = holding;
   $('holdLabel').textContent = holding ? t.holdingNow : t.hold;
@@ -438,14 +493,14 @@ function render() {
 
 $('holdBtn').onclick = () => {
   me.holdingSince = Date.now();
-  save(); publish({ type: 'hold' }); render(); toast(t.toastHold);
+  save(); publish('hold'); render(); toast(t.toastHold);
 };
 $('goBtn').onclick = () => {
   const held = me.holdingSince ? Date.now() - me.holdingSince : 0;
   me.bestHold = Math.max(me.bestHold, held);
   me.holdingSince = null;
   me.trips.push(Date.now());
-  save(); publish({ type: 'go', mins: Math.floor(held / MIN) }); render(); toast(t.toastGo(num(me.trips.length))); splash($('goBtn'));
+  save(); publish('go', Math.floor(held / MIN)); render(); toast(t.toastGo(num(me.trips.length))); splash($('goBtn'));
 };
 
 $('remind').checked = !!me.remind;
@@ -479,28 +534,11 @@ $('installBtn').onclick = async () => {
   $('installBtn').hidden = true;
 };
 
-// ---- demo simulator (delete when the real backend is wired) ----
-const FLAGS = ['🇩🇪', '🇯🇵', '🇺🇸', '🇧🇷', '🇮🇳', '🇫🇷', '🇬🇧', '🇨🇦', '🇹🇷', '🇦🇺', '🇲🇽', '🇳🇱', '🇰🇷', '🇸🇪'];
-const rnd = n => Math.floor(Math.random() * n);
-function simulate() {
-  const flag = FLAGS[rnd(FLAGS.length)];
-  const roll = Math.random();
-  if (roll < 0.3) { world.holding++; addFeed({ type: 'hold', flag }); }
-  else {
-    world.todayTotal++;
-    world.inToilet = Math.max(3, world.inToilet + rnd(3) - 1);
-    if (roll < 0.6) { world.holding = Math.max(5, world.holding - 1); addFeed({ type: 'go', mins: 5 + rnd(70), flag }); }
-    else if (roll < 0.7) addFeed({ type: 'go', nth: 6 + rnd(6), flag });
-    else addFeed({ type: 'go', flag });
-  }
-  render();
-  setTimeout(simulate, 2000 + rnd(4000));
-}
-
-for (let i = 0; i < 4; i++) addFeed({ type: 'go', mins: i % 2 ? 10 + rnd(50) : 0, flag: FLAGS[rnd(FLAGS.length)] });
 render();
 setInterval(render, 1000);
-setTimeout(simulate, 2000);
+pulse();
+setInterval(() => { if (!document.hidden) pulse(); }, 5000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pulse(); });
 </script>
 </body>
 </html>
