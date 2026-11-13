@@ -293,3 +293,216 @@ revoke all on function public.report_place(uuid, bigint) from public;
 grant execute on function public.add_place(uuid, double precision, double precision, text, text) to anon, authenticated;
 grant execute on function public.places_near(double precision, double precision, int) to anon, authenticated;
 grant execute on function public.report_place(uuid, bigint) to anon, authenticated;
+
+-- Rich toilet details and live, user-submitted status reports.
+alter table public.places add column if not exists toilet_type text not null default 'unknown'
+  check (toilet_type in ('iranian', 'western', 'both', 'unknown'));
+alter table public.places add column if not exists opening_hours text;
+
+create table if not exists public.status_reports (
+  id          bigint generated always as identity primary key,
+  place_id    bigint not null references public.places(id) on delete cascade,
+  session     uuid not null,
+  status      text not null check (status in ('usable', 'clean', 'dirty', 'closed', 'paid')),
+  created_at  timestamptz not null default now(),
+  unique (place_id, session, status)
+);
+create index if not exists status_reports_place_idx on public.status_reports (place_id, created_at desc);
+alter table public.status_reports enable row level security;
+revoke all on table public.status_reports from anon, authenticated;
+
+-- Keep an append-only rate-limit ledger: revising a report must not reset its quota.
+alter table public.status_reports add column if not exists ip_hash text;
+create table if not exists private.status_report_attempts (
+  session uuid not null,
+  ip_hash text,
+  created_at timestamptz not null default now()
+);
+create index if not exists status_attempt_session_idx on private.status_report_attempts(session, created_at);
+create index if not exists status_attempt_ip_idx on private.status_report_attempts(ip_hash, created_at);
+revoke all on table private.status_report_attempts from public, anon, authenticated;
+
+-- Use the same effective status in both the submission response and the nearby list.
+create or replace function public.effective_place_status(p_place_id bigint)
+returns table(status text, created_at timestamptz)
+language sql stable security definer set search_path = ''
+as $$
+  select r.status, r.created_at from public.status_reports r
+  where r.place_id = p_place_id and r.created_at > now() - interval '24 hours'
+    and (r.status <> 'closed' or (
+      r.created_at > now() - interval '2 hours'
+      and (select count(distinct c.session) >= 2 and count(distinct c.ip_hash) >= 2
+           from public.status_reports c
+           where c.place_id = p_place_id and c.status = 'closed'
+             and c.created_at > now() - interval '2 hours')
+    ))
+  order by r.created_at desc, r.id desc limit 1;
+$$;
+revoke all on function public.effective_place_status(bigint) from public, anon, authenticated;
+
+create or replace function public.report_status(p_session uuid, p_place_id bigint, p_status text)
+returns json
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_result json;
+  h json := coalesce(nullif(current_setting('request.headers', true), ''), '{}')::json;
+  v_ip text := trim(split_part(coalesce(h->>'cf-connecting-ip', h->>'x-real-ip', h->>'x-forwarded-for', ''), ',', 1));
+  v_hash text;
+begin
+  if p_session is null or p_status is null or p_status not in ('usable', 'clean', 'dirty', 'closed', 'paid') then
+    raise exception 'bad report';
+  end if;
+  if not exists (select 1 from public.places where id = p_place_id and not hidden) then
+    raise exception 'missing place';
+  end if;
+  -- Stable salted network identity prevents changing sessions (or crossing midnight)
+  -- from manufacturing independent confirmations. Raw addresses are never stored.
+  if v_ip <> '' then
+    select md5(v_ip || salt) into v_hash from private.settings;
+    perform pg_catalog.pg_advisory_xact_lock(5101, pg_catalog.hashtext(v_hash));
+  end if;
+  perform pg_catalog.pg_advisory_xact_lock(5102, pg_catalog.hashtext(p_session::text));
+  if (select count(*) from private.status_report_attempts
+      where session = p_session and created_at > now() - interval '24 hours') >= 20
+     or (v_hash is not null and (select count(*) from private.status_report_attempts
+      where ip_hash = v_hash and created_at > now() - interval '24 hours') >= 40) then
+    raise exception 'daily limit';
+  end if;
+  -- A browser may revise the same signal, but cannot hammer the endpoint.
+  if exists (select 1 from public.status_reports where place_id = p_place_id and session = p_session
+             and created_at > now() - interval '20 seconds') then
+    raise exception 'too fast';
+  end if;
+  delete from public.status_reports
+  where place_id = p_place_id and session = p_session
+    and ((status in ('clean', 'dirty') and p_status in ('clean', 'dirty'))
+      or (status in ('usable', 'closed') and p_status in ('usable', 'closed'))
+      or status = p_status);
+  insert into public.status_reports (place_id, session, status, ip_hash)
+  values (p_place_id, p_session, p_status, v_hash);
+  insert into private.status_report_attempts(session, ip_hash) values (p_session, v_hash);
+  delete from private.status_report_attempts where created_at < now() - interval '24 hours';
+  select json_build_object('status', status, 'reported_at', created_at)
+    into v_result from public.effective_place_status(p_place_id);
+  return coalesce(v_result, json_build_object('status', null, 'reported_at', null));
+end $$;
+
+-- Replace the nearby query with a richer response. Recent reports expire so stale information
+-- never presents itself as a live guarantee.
+create or replace function public.places_near(p_lat double precision, p_lon double precision, p_radius int default 5000)
+returns json
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(json_agg(x order by x.dist), '[]'::json) from (
+    select p.id, p.lat, p.lon, p.fee, p.note, p.toilet_type, p.opening_hours,
+           cardinality(p.by_sessions) as confirms, d.dist,
+           sr.status as last_status, sr.created_at as last_reported_at
+    from public.places p
+    cross join lateral (select 111320 * sqrt(power(p.lat - p_lat, 2) + power((p.lon - p_lon) * cos(radians(p_lat)), 2)) as dist) d
+    left join lateral public.effective_place_status(p.id) sr on true
+    where not p.hidden
+      and p.lat between p_lat - 0.15 and p_lat + 0.15
+      and p.lon between p_lon - 0.3 and p_lon + 0.3
+      and d.dist <= least(greatest(coalesce(p_radius, 5000), 100), 15000)
+    order by d.dist limit 20
+  ) x;
+$$;
+
+revoke all on function public.report_status(uuid, bigint, text) from public;
+grant execute on function public.report_status(uuid, bigint, text) to anon, authenticated;
+
+-- Reactions are hidden in the current UI. Preserve the legacy table, data and RPC
+-- for cached clients; retiring them requires a separate migration and backup.
+
+create or replace function public.set_place_details(p_session uuid, p_place_id bigint,
+                                                     p_toilet_type text default 'unknown', p_opening_hours text default null)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare v_hours text := nullif(left(btrim(regexp_replace(coalesce(p_opening_hours, ''), '[[:cntrl:]]', '', 'g')), 80), '');
+begin
+  if p_session is null or p_toilet_type not in ('iranian', 'western', 'both', 'unknown') then
+    raise exception 'bad details';
+  end if;
+  update public.places set toilet_type = p_toilet_type, opening_hours = v_hours
+  where id = p_place_id and p_session = any(by_sessions);
+  if not found then raise exception 'missing place'; end if;
+end $$;
+revoke all on function public.set_place_details(uuid, bigint, text, text) from public;
+grant execute on function public.set_place_details(uuid, bigint, text, text) to anon, authenticated;
+
+-- One RPC transaction: a details error rolls back the insert or nearby-place confirmation too.
+-- Keep the existing RPCs available for cached clients.
+create or replace function public.add_place_with_details(
+  p_session uuid, p_lat double precision, p_lon double precision,
+  p_fee text default 'unknown', p_note text default null,
+  p_toilet_type text default 'unknown', p_opening_hours text default null)
+returns bigint
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare v_id bigint;
+begin
+  v_id := public.add_place(p_session, p_lat, p_lon, p_fee, p_note);
+  perform public.set_place_details(p_session, v_id, p_toilet_type, p_opening_hours);
+  return v_id;
+end $$;
+revoke all on function public.add_place_with_details(uuid, double precision, double precision, text, text, text, text) from public;
+grant execute on function public.add_place_with_details(uuid, double precision, double precision, text, text, text, text) to anon, authenticated;
+
+-- Private, anonymous feedback. Nothing here is exposed back to visitors; review it in the dashboard.
+create table if not exists public.feedback (
+  id          bigint generated always as identity primary key,
+  session     uuid not null,
+  kind        text not null check (kind in ('bug', 'idea', 'place', 'other')),
+  message     text not null check (char_length(message) between 3 and 500),
+  lang        text not null check (lang in ('fa', 'en')),
+  app_version text,
+  ip_hash     text not null,
+  created_at  timestamptz not null default now()
+);
+alter table public.feedback add column if not exists public_name text;
+create index if not exists feedback_created_idx on public.feedback (created_at desc);
+alter table public.feedback enable row level security;
+revoke all on table public.feedback from anon, authenticated;
+
+drop function if exists public.submit_feedback(uuid, text, text, text, text);
+create or replace function public.submit_feedback(p_session uuid, p_kind text, p_message text, p_name text default null,
+                                                   p_lang text default 'fa', p_app_version text default null)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  h      json := coalesce(nullif(current_setting('request.headers', true), ''), '{}')::json;
+  v_ip   text := trim(split_part(coalesce(h->>'cf-connecting-ip', h->>'x-real-ip', h->>'x-forwarded-for', ''), ',', 1));
+  v_hash text;
+  v_msg  text := left(btrim(regexp_replace(regexp_replace(coalesce(p_message, ''), '[[:cntrl:]]', '', 'g'), '\s+', ' ', 'g')), 500);
+  v_name text := nullif(left(btrim(regexp_replace(regexp_replace(coalesce(p_name, ''), '[[:cntrl:]]', '', 'g'), '\s+', ' ', 'g')), 16), '');
+begin
+  if p_session is null or p_kind not in ('bug', 'idea', 'place', 'other') or char_length(v_msg) < 3 then
+    raise exception 'bad feedback';
+  end if;
+  select md5(v_ip || current_date::text || salt) into v_hash from private.settings;
+  if (select count(*) from public.feedback where session = p_session and created_at > now() - interval '1 day') >= 5 then
+    raise exception 'daily limit';
+  end if;
+  if v_ip <> '' and (select count(*) from public.feedback where ip_hash = v_hash and created_at > now() - interval '1 day') >= 10 then
+    raise exception 'daily limit';
+  end if;
+  insert into public.feedback(session, kind, message, public_name, lang, app_version, ip_hash)
+  values (p_session, p_kind, v_msg, v_name, case when p_lang = 'en' then 'en' else 'fa' end,
+          nullif(left(coalesce(p_app_version, ''), 30), ''), v_hash);
+end $$;
+revoke all on function public.submit_feedback(uuid, text, text, text, text, text) from public;
+grant execute on function public.submit_feedback(uuid, text, text, text, text, text) to anon, authenticated;

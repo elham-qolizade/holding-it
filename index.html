@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>نگه داشتم — زنده</title>
+<meta name="description" content="ثبت زنده‌ی مأموریت‌های دستشویی، آمار روزانه و پیدا کردن دستشویی نزدیک؛ بدون ثبت‌نام.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="نگه داشتم — دادگاه عالی امور مثانه">
+<meta property="og:description" content="مأموریت امروزت را ثبت کن و حکم رسمی مثانه‌ات را بگیر.">
+<meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#fff8ec">
 <link rel="icon" href="icon-192.png">
@@ -12,7 +17,7 @@
 <meta name="apple-mobile-web-app-title" content="نگه داشتم">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Fredoka:wght@700&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&family=Fredoka:wght@400;500;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@400..800&amp;text=%DB%B0%DB%B1%DB%B2%DB%B3%DB%B4%DB%B5%DB%B6%DB%B7%DB%B8%DB%B9&amp;display=swap" rel="stylesheet">
 <style>
   /* Retro desktop look: a dithered pastel "desktop", a menu bar, cream windows with striped
@@ -114,6 +119,18 @@
   #sosAdd .fee label { display: flex; align-items: center; gap: 6px; min-height: 36px; cursor: pointer; }
   #sosNoteIn { width: 100%; min-height: 44px; padding: 6px 12px; background: var(--panel); color: var(--ink);
                border: 2px solid var(--ink); border-radius: 8px; font: 1rem/1.3 var(--type); }
+  .detail-fields { display: grid; gap: 8px; margin: 10px 0; }
+  .detail-fields label { display: grid; gap: 4px; font-weight: 700; }
+  .detail-fields :is(select, input) { width: 100%; min-height: 44px; padding: 6px 10px; background: var(--panel); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; font: 1rem/1.3 var(--type); }
+  .condition { margin: 10px 0; padding: 0; border: 0; }
+  .condition legend { margin-bottom: 6px; font-weight: 700; }
+  .condition-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .condition-options label { position: relative; display: flex; min-height: 44px; align-items: center; justify-content: center; padding: 6px; border: 1px solid var(--ink); border-radius: 7px; background: var(--panel); cursor: pointer; text-align: center; }
+  .condition-options input { position: absolute; opacity: 0; }
+  .condition-options label:has(input:checked) { background: var(--mint); box-shadow: 2px 2px 0 var(--ink); font-weight: 700; }
+  .condition-options label:has(input:focus-visible) { outline: 2px dashed var(--ink); outline-offset: 2px; }
+  .sos-advanced { margin: 10px 0; border-top: 1px dotted var(--ink); }
+  .sos-advanced > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 700; color: var(--muted); }
   #sosNoteIn:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
   #sosAddStatus { margin: 8px 0 0; font-weight: 700; }
   #sosAddStatus:empty { display: none; }
@@ -123,6 +140,17 @@
   #sosList b { font-size: 1.02rem; }
   #sosList .muted { grid-column: 1; }
   #sosList a { grid-column: 2; grid-row: 1 / span 2; width: auto; margin: 0; padding: 8px 14px; text-decoration: none; color: var(--ink); background: var(--teal); }
+  #sosList li.place { border: 1px solid transparent; padding: 10px 8px; }
+  #sosList li.place.closed { opacity: .68; border-color: var(--coral); background: var(--blush); }
+  .badges { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge { padding: 2px 7px; border: 1px solid var(--ink); border-radius: 999px; background: var(--panel); font-size: .78rem; }
+  .badge.good { background: var(--mint); } .badge.bad { background: var(--blush); } .badge.money { background: var(--butter); }
+  .place-tools { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .status-toggle { min-height: 44px; padding: 6px 10px; border: 1px solid var(--ink); background: var(--panel); border-radius: 7px; }
+  .status-box { grid-column: 1 / -1; border-top: 1px dotted var(--ink); padding-top: 8px; }
+  .status-actions { display: grid; grid-template-columns: repeat(5, minmax(44px, 1fr)); gap: 6px; margin-top: 6px; }
+  .status-actions button { min-width: 44px; min-height: 44px; padding: 3px; border: 1px solid var(--ink); border-radius: 6px; background: var(--panel); font-size: 1.15rem; }
+  .rescue { display: inline-flex; min-height: 44px; align-items: center; margin-top: 8px; color: var(--ink); font-weight: 700; }
   .win.day { --bar: var(--yellow); } .win.feedwin { --bar: var(--lilac); }
   .win h2 .box { order: -1; width: 11px; height: 11px; flex: none; padding: 0; position: relative; border: 1px solid var(--ink); background: var(--panel); }
   .win h2 .box::after { content: ''; position: absolute; inset: -16px; }   /* bigger tap target */
@@ -187,13 +215,26 @@
     background-image: linear-gradient(45deg, transparent 44%, var(--ink) 44% 56%, transparent 56%),
                 linear-gradient(-45deg, transparent 44%, var(--ink) 44% 56%, transparent 56%);
   }
+  #waterOpen { background: #dff7ff; }
+  .water-card { margin-top: 8px; padding: 12px; border: 1px solid var(--ink); border-radius: 9px; background: #dff7ff; }
+  .water-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+  .water-head b { font: 700 25px/1.2 var(--pixel); }
+  .water-goal { display: flex; align-items: center; gap: 5px; font-size: .8rem; }
+  .water-goal select { min-height: 36px; padding: 3px 5px; color: var(--ink); background: var(--panel); border: 1px solid var(--ink); border-radius: 6px; font: inherit; }
+  .water-track { height: 14px; margin: 10px 0; overflow: hidden; border: 1px solid var(--ink); background: var(--panel); }
+  #waterProgress { display: block; width: 0; height: 100%; background: var(--teal); transition: width .25s ease; }
+  .water-actions { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
+  .water-actions button { min-height: 44px; padding: 6px 8px; border: 1px solid var(--ink); border-radius: 7px; background: var(--panel); box-shadow: 1px 1px 0 var(--ink); }
+  .water-actions button:first-child { background: var(--teal); font-weight: 700; }
+  #waterUndo { min-width: 44px; }
+  #waterMeta { display: block; margin-top: 8px; }
 
   .feed { list-style: none; margin: 0; padding: 8px 12px; min-height: 290px; font-size: 0.95rem; }
   .feed li { padding: 7px 6px; border-bottom: 1px dotted var(--ink); }
   .feed li.new { animation: slide .2s steps(3); }
   .feed li.me { background: var(--yellow); font-weight: 600; }
   @keyframes slide { from { opacity: 0; transform: translateY(-6px); } }
-  @media (prefers-reduced-motion: reduce) { .dot, .feed li, .bump { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .dot, .feed li, .bump, .stamp, .cert-confetti, .balloon { animation: none; } }
   .total b { display: inline-block; }   /* inline boxes cannot be transformed, so the hop needs this */
   .bump { animation: bump .3s steps(3); }
   @keyframes bump { 50% { transform: translateY(-6px); } }
@@ -202,11 +243,53 @@
     45% { transform: translate(calc(var(--dx) * .6), var(--dy)); }
     100% { transform: translate(var(--dx), 90px); opacity: 0; }
   }
+  .balloon { position: fixed; z-index: 6; left: var(--bx); bottom: -70px; width: 34px; height: 43px; border: 2px solid var(--ink); border-radius: 50% 50% 46% 46%; background: var(--bc); pointer-events: none; animation: balloon-up 1.8s cubic-bezier(.2,.7,.3,1) var(--bd) forwards; }
+  .balloon::before { content: ''; position: absolute; left: 13px; bottom: -8px; border-inline: 4px solid transparent; border-top: 8px solid var(--ink); }
+  .balloon::after { content: ''; position: absolute; left: 16px; top: 49px; width: 1px; height: 48px; background: var(--ink); }
+  @keyframes balloon-up { 0% { transform: translateY(0) rotate(-5deg); } 45% { transform: translateY(-48vh) translateX(var(--bs)) rotate(6deg); } 100% { transform: translateY(-115vh) translateX(var(--be)) rotate(-8deg); } }
   #toast {
     position: fixed; inset-inline: 0; bottom: 20px; width: fit-content; max-width: calc(100% - 24px); margin: 0 auto;
     padding: 10px 16px; background: var(--ink); color: var(--yellow); border: 2px solid var(--panel);
     box-shadow: 0 0 0 2px var(--ink); font: 600 1.05rem/1.3 var(--pixel); text-align: center;
   }
+  #certificateDialog { width: min(440px, calc(100% - 24px)); max-height: calc(100vh - 24px); padding: 0; border: 0; background: transparent; color: var(--ink); }
+  #certificateDialog::backdrop { background: #2a1a4acc; backdrop-filter: blur(2px); }
+  .certificate { position: relative; overflow: hidden; padding: 24px 20px 20px; border: 3px double var(--ink); background:
+    linear-gradient(#2a1a4a0d 1px, transparent 1px) 0 0 / 100% 26px, #fff8df; box-shadow: 8px 8px 0 #160d28; text-align: center; }
+  .certificate.reveal { animation: certificate-in .55s cubic-bezier(.16, 1, .3, 1) both; }
+  @keyframes certificate-in { from { opacity: 0; transform: translateY(45px) scale(.94) rotate(1.5deg); } to { opacity: 1; transform: translateY(0) scale(1) rotate(0); } }
+  .certificate::before { content: ''; position: absolute; inset: 8px; border: 1px solid var(--ink); pointer-events: none; }
+  .court-kicker { margin: 0; font: 700 .82rem/1.4 var(--pixel); letter-spacing: .08em; text-transform: uppercase; }
+  .certificate h3 { margin: 8px 0 2px; font: 800 1.7rem/1.3 var(--title); }
+  .case-no { margin: 0 0 18px; font-size: .78rem; }
+  .verdict { margin: 0; padding: 12px; border-block: 1px solid var(--ink); font-weight: 700; }
+  .cert-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 16px 0; }
+  .cert-stats > div { padding: 6px 4px; }
+  .cert-stats > div + div { border-inline-start: 1px solid var(--ink); }
+  .cert-stats b { display: block; font: 700 1.35rem/1.2 var(--pixel); }
+  .cert-stats small { display: block; font-size: .72rem; }
+  .stamp { width: 126px; height: 126px; margin: 2px auto 12px; display: grid; place-items: center; border: 5px double #ba2636; border-radius: 50%; color: #ba2636; font: 800 1rem/1.15 var(--pixel); opacity: 0; transform: rotate(-13deg); text-transform: uppercase; white-space: pre-line; }
+  .stamp.hit { animation: stamp-in .72s cubic-bezier(.18, 1.45, .32, 1) both; }
+  @keyframes stamp-in { from { opacity: 0; transform: translateY(-65px) scale(2.2) rotate(-24deg); } 68% { opacity: 1; transform: translateY(5px) scale(.86) rotate(-10deg); } 84% { transform: translateY(-2px) scale(1.06) rotate(-14deg); } to { opacity: 1; transform: translateY(0) scale(1) rotate(-13deg); } }
+  .cert-confetti { position: absolute; z-index: 2; width: 8px; height: 12px; top: 48%; left: 50%; pointer-events: none; background: var(--confetti); animation: cert-confetti .85s cubic-bezier(.15,.7,.35,1) forwards; }
+  @keyframes cert-confetti { from { opacity: 1; transform: translate(-50%, -50%) rotate(0); } to { opacity: 0; transform: translate(var(--cx), var(--cy)) rotate(var(--cr)); } }
+  @media (prefers-reduced-motion: reduce) { .certificate.reveal { animation: none; } .stamp { opacity: 1; } }
+  .cert-actions { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+  .cert-actions .btn { min-height: 50px; margin: 0; font-size: 1rem; }
+  #certShare { background: var(--lilac); }
+  #certClose { min-width: 54px; }
+  #certStatus { min-height: 1.5em; margin: 8px 0 0; }
+  .feedback-box { background: var(--panel); border: 1px solid var(--ink); border-radius: 8px; box-shadow: 2px 2px 0 var(--ink); }
+  .feedback-box > summary { min-height: 48px; padding: 8px 12px; display: flex; align-items: center; cursor: pointer; font-weight: 700; }
+  .feedback-form { padding: 0 12px 12px; border-top: 1px dotted var(--ink); }
+  .feedback-types { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 12px 0; }
+  .feedback-types label { position: relative; min-height: 44px; padding: 7px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ink); border-radius: 7px; text-align: center; cursor: pointer; }
+  .feedback-types input { position: absolute; opacity: 0; }
+  .feedback-types label:has(input:checked) { background: var(--lilac); box-shadow: 2px 2px 0 var(--ink); font-weight: 700; }
+  .feedback-name { display: grid; gap: 4px; margin-bottom: 8px; font-weight: 700; }
+  #feedbackName, #feedbackMessage { width: 100%; padding: 9px 10px; color: var(--ink); background: var(--panel); border: 2px solid var(--ink); border-radius: 8px; font: 1rem/1.5 var(--type); }
+  #feedbackName { min-height: 44px; } #feedbackMessage { min-height: 110px; resize: vertical; }
+  #feedbackStatus { min-height: 1.5em; margin: 8px 0 0; font-weight: 700; }
   footer { text-align: center; font-size: 0.84rem; text-transform: uppercase; letter-spacing: .03em; }
 </style>
 </head>
@@ -268,6 +351,7 @@
     <div class="body">
       <button id="sosBtn" class="btn" data-t="sosFind"></button>
       <p id="sosStatus" role="status"></p>
+      <a id="sosFallback" class="rescue" target="_blank" rel="noopener" hidden></a>
       <ul id="sosList"></ul>
       <details id="sosAdd">
         <summary data-t="sosAddOpen"></summary>
@@ -277,7 +361,29 @@
           <label><input type="radio" name="fee" value="paid"> <span data-t="sosPaidLabel"></span></label>
           <label><input type="radio" name="fee" value="unknown" checked> <span data-t="sosFeeUnknown"></span></label>
         </div>
-        <input id="sosNoteIn" maxlength="60" autocomplete="off">
+        <fieldset class="condition">
+          <legend data-t="sosConditionLabel"></legend>
+          <div class="condition-options">
+            <label><input type="radio" name="initialStatus" value="usable"><span data-t="sosConditionUsable"></span></label>
+            <label><input type="radio" name="initialStatus" value="clean"><span data-t="sosConditionClean"></span></label>
+            <label><input type="radio" name="initialStatus" value="dirty"><span data-t="sosConditionDirty"></span></label>
+          </div>
+        </fieldset>
+        <details class="sos-advanced">
+          <summary data-t="sosAdvanced"></summary>
+          <div class="detail-fields">
+            <label><span data-t="sosTypeLabel"></span>
+              <select id="sosTypeIn">
+                <option value="unknown" data-t="sosTypeUnknown"></option>
+                <option value="iranian" data-t="sosTypeIranian"></option>
+                <option value="western" data-t="sosTypeWestern"></option>
+                <option value="both" data-t="sosTypeBoth"></option>
+              </select>
+            </label>
+            <label><span data-t="sosHoursLabel"></span><input id="sosHoursIn" maxlength="80" data-t-placeholder="sosHoursPh"></label>
+            <label><span data-t="sosNoteLabel"></span><input id="sosNoteIn" maxlength="60" autocomplete="off"></label>
+          </div>
+        </details>
         <button id="sosAddBtn" class="btn small" data-t="sosAddGo"></button>
         <p id="sosAddStatus" role="status"></p>
       </details>
@@ -293,6 +399,22 @@
         <div><b id="sBest">–</b><span class="muted" data-t="best"></span></div>
       </div>
       <label class="remind"><input type="checkbox" id="remind"> <span data-t="remind"></span></label>
+      <button id="waterOpen" class="btn small" type="button" data-t="waterOpen" aria-expanded="false"></button>
+      <div class="water-card" id="waterCard" hidden>
+        <div class="water-head">
+          <span><b id="waterTotal">0</b> <span data-t="waterCups"></span></span>
+          <label class="water-goal"><span data-t="waterGoal"></span>
+            <select id="waterGoal"><option value="1500">6</option><option value="2000" selected>8</option><option value="2500">10</option><option value="3000">12</option></select>
+          </label>
+        </div>
+        <div class="water-track" id="waterTrack" role="progressbar" aria-valuemin="0"><span id="waterProgress"></span></div>
+        <div class="water-actions">
+          <button id="water250" type="button" data-t="waterOne"></button>
+          <button id="water500" type="button" data-t="waterTwo"></button>
+          <button id="waterUndo" type="button" data-t="waterUndo"></button>
+        </div>
+        <small id="waterMeta" class="muted"></small>
+      </div>
       <button id="shareBtn" class="btn small"><span data-t="share" id="shareLabel"></span></button>
     </div>
   </section>
@@ -302,15 +424,51 @@
     <ul class="feed" id="feed"></ul>
   </section>
 
+  <details class="feedback-box">
+    <summary data-t="feedbackOpen"></summary>
+    <div class="feedback-form">
+      <p class="muted" data-t="feedbackPrivacy"></p>
+      <div class="feedback-types">
+        <label><input type="radio" name="feedbackKind" value="bug" checked><span data-t="feedbackBug"></span></label>
+        <label><input type="radio" name="feedbackKind" value="idea"><span data-t="feedbackIdea"></span></label>
+        <label><input type="radio" name="feedbackKind" value="place"><span data-t="feedbackPlace"></span></label>
+        <label><input type="radio" name="feedbackKind" value="other"><span data-t="feedbackOther"></span></label>
+      </div>
+      <label class="feedback-name"><span data-t="feedbackNameLabel"></span><input id="feedbackName" maxlength="16" autocomplete="nickname"></label>
+      <textarea id="feedbackMessage" maxlength="500" data-t-placeholder="feedbackPlaceholder"></textarea>
+      <button id="feedbackSend" type="button" class="btn small" data-t="feedbackSend"></button>
+      <p id="feedbackStatus" role="status"></p>
+    </div>
+  </details>
+
   <footer data-t="footer"></footer>
   <div id="toast" role="status" hidden></div>
+  <dialog id="certificateDialog">
+    <article class="certificate">
+      <p class="court-kicker" data-t="certCourt"></p>
+      <h3 data-t="certTitle"></h3>
+      <p class="case-no" id="certCase"></p>
+      <p class="verdict" id="certVerdict"></p>
+      <div class="cert-stats">
+        <div><b id="certTrips">0</b><small data-t="certTripsLabel"></small></div>
+        <div><b id="certHold">–</b><small data-t="certHoldLabel"></small></div>
+        <div><b id="certWater">0</b><small data-t="certWaterLabel"></small></div>
+      </div>
+      <div class="stamp" id="certStamp" data-t="certStamp"></div>
+      <div class="cert-actions">
+        <button id="certShare" class="btn" type="button" data-t="certShare"></button>
+        <button id="certClose" class="btn" type="button" data-t="certClose" aria-label="Close"></button>
+      </div>
+      <p id="certStatus" role="status"></p>
+    </article>
+  </dialog>
 </main>
 
 <script>
 const $ = id => document.getElementById(id);
 const MIN = 60_000;
+const APP_VERSION = 'web-21';
 const NUDGE_AFTER = 180 * MIN;
-const HOLD_EXPIRY = 180 * MIN; // a forgotten "holding" status clears itself
 const TITLE_AT = [0, 5, 15, 30, 45, 60]; // minutes at which each hold title unlocks
 
 // ---- text, per language. Strings are plain text; functions take already-formatted numbers. ----
@@ -324,7 +482,22 @@ const T = {
     hold: "I'm holding it", go: 'I went! +1',
     yourDay: 'Your day', trips: 'trips today', gap: 'between trips', best: 'longest hold',
     remind: "Nudge me if I haven't gone in 3 hours",
+    waterOpen: '💧 Drank water? Log it', waterHide: 'Hide the water business', waterCups: 'glasses today', waterGoal: 'My glass goal',
+    waterProgress: 'Water progress', waterUndo: 'Undo', waterOne: '+ 1 glass', waterTwo: '+ 2 glasses',
+    waterToast: n => `${n} glass${n === '1' ? '' : 'es'} joined the bladder queue 😅`, waterEmpty: 'The water department has no reports yet.',
+    waterLast: (n, time) => `${n} water stop${n === '1' ? '' : 's'} · last at ${time}`, waterDone: 'Goal reached. Your bladder has been notified. 🚨',
     share: 'Share my day', copied: 'Copied!', feedTitle: 'Live feed',
+    certCourt: 'Supreme Court of Bladder Affairs', certTitle: 'Official Daily Certificate',
+    certCase: n => `Case no. ${n}`,
+    certVerdictNone: 'No bathroom mission has been logged today. The court finds the evidence insufficient.',
+    certVerdictHolding: n => `The defendant has been holding it for ${n}. Immediate action is strongly advised.`,
+    certVerdictLong: n => `A resistance of ${n} was recorded. The court considers this behavior unnecessarily heroic.`,
+    certVerdictBusy: n => `${n} bathroom missions were recorded today. Traffic is suspicious, but still legal.`,
+    certVerdictRelieved: n => `The court confirms ${n} successful bathroom mission${n === '1' ? '' : 's'} today.`,
+    certTripsLabel: 'missions', certHoldLabel: 'longest hold', certWaterLabel: 'glasses',
+    certStamp: 'Officially\nRelieved', certStampNone: 'Insufficient\nEvidence', certStampHolding: 'Critical\nCase', certStampLong: 'Illegal\nResistance', certStampBusy: 'Suspicious\nTraffic', certShare: 'Share certificate image', certClose: '×', certCloseLabel: 'Close certificate',
+    certPreparing: 'Preparing the evidence…', certCopied: 'The verdict was delivered.', certDownloaded: 'Certificate downloaded. Attach it to your post!', certShareFail: 'Sharing was blocked. Try again.',
+    certFooter: 'HOLDING IT · Get your own bladder verdict',
     liveTitle: 'Right now', timerTitle: 'Resisting',
     how: 'Need to go, or just went? Tap a button.',
     sosTitle: 'Emergency', sosShort: 'SOS', sosFind: 'Find the nearest toilet',
@@ -337,11 +510,21 @@ const T = {
     sosAddOpen: '➕ Is there a public toilet here? Add it',
     sosAddNote: 'It is saved where you are standing and shown to everyone nearby. Public places only, not homes or private spots.',
     sosFreeLabel: 'Free', sosPaidLabel: 'Paid', sosFeeUnknown: 'Not sure',
+    sosTypeLabel: 'Toilet type', sosTypeUnknown: 'Not sure', sosTypeIranian: 'Iranian', sosTypeWestern: 'Western', sosTypeBoth: 'Both',
+    sosHoursLabel: 'Opening hours', sosHoursPh: 'optional: e.g. 8:00–22:00 or 24/7',
+    sosConditionLabel: 'How is it right now? (optional)', sosConditionUnknown: '🤷 Not sure', sosConditionUsable: '🚽 Usable', sosConditionClean: '🧼 Clean', sosConditionDirty: '🤢 Dirty',
+    sosAdvanced: 'More details (optional)', sosNoteLabel: 'Short note',
     sosNotePh: 'Short note, optional (e.g. next to the mosque)', sosAddGo: 'Add this place',
     sosAdding: 'Getting your location…', sosAdded: 'Added. Thank you!',
     sosAddAlready: 'You already added this place.', sosAddLimit: "You've added a lot today. Try again tomorrow.",
     sosAddError: 'Could not add it. Try again in a moment.',
     sosCommunity: 'added by visitors', sosConfirms: n => `confirmed by ${n}`, sosReport: 'Wrong?', sosReported: 'Reported',
+    sosUpdate: 'Report live status',
+    sosStatusLimit: 'Daily report limit reached. Try again later.', sosStatusPending: 'Report saved. Closure needs confirmation from another network.', sosStatusSent: 'Status updated', sosStatusError: 'Could not update status.', sosStatusTooFast: 'Wait at least 20 seconds between reports for this place.',
+    sosAgo: n => `${n} min ago`, sosClosedRecent: 'Recently reported closed',
+    sosHours: h => `Hours: ${h}`, sosType: { iranian: 'Iranian', western: 'Western', both: 'Iranian + Western', unknown: 'Type unknown' },
+    sosStatuses: { usable: '🚽 Usable', clean: '🧼 Clean', dirty: '🤢 Dirty', closed: '🔒 Closed', paid: '💸 Paid' },
+    sosFallback: 'Open a toilet search in Google Maps',
     sosKinds: { fuel: 'Petrol station', mosque: 'Mosque / prayer room', worship: 'Place of worship', hospital: 'Hospital', clinic: 'Clinic' },
     metres: n => `${n} m`, kms: n => `${n} km`,
     newsTitle: 'Pee News', breaking: 'Breaking', anon: 'An anonymous hero',
@@ -364,6 +547,12 @@ const T = {
     nameLabel: 'Name', namePh: 'optional: your name or a nickname', someone: 'Someone',
     install: 'Install app', holdingNow: 'Holding…', collapse: 'Collapse window',
     toastHold: 'Timer started. Stay strong.', toastGo: n => `Logged! Trip #${n} today.`,
+    feedbackOpen: 'Support & suggestions', feedbackPrivacy: 'Sent privately. It stays anonymous unless you choose to add a name; location and daily stats are never included.',
+    feedbackBug: 'Something is broken', feedbackIdea: 'I have an idea', feedbackPlace: 'Wrong toilet info', feedbackOther: 'Something else',
+    feedbackNameLabel: 'Name or nickname (optional)', feedbackNamePh: 'Leave empty to stay anonymous',
+    feedbackPlaceholder: 'Tell the bladder department what happened…', feedbackSend: 'Send to bladder HQ',
+    feedbackSending: 'Filing your letter…', feedbackSent: 'Your letter reached the bladder archives. Thank you!',
+    feedbackShort: 'Write at least 3 characters.', feedbackLimit: 'The mailbox is full for today. Try again tomorrow.', feedbackError: 'Could not send it. Try again.',
     footer: 'No sign-up. Your stats stay in this browser.',
     feedEmpty: 'Nobody yet. Be the first.',
     titles: ['Level: Rookie', 'Level: Committed', 'Level: Iron Bladder', 'Level: National Hero 🏅',
@@ -374,8 +563,8 @@ const T = {
     fNth: (mine, n) => `${mine ? 'You' : 'Someone'} went for the ${n} time today 🏆`,
     fAfter: (mine, n) => `${mine ? 'You' : 'Someone'} finally went after ${n} minutes 😅`,
     fGo: mine => `${mine ? 'You' : 'Someone'} just went 🚽`,
-    shareText: (n, best) => `I went ${n} time${n === '1' ? '' : 's'} today`
-      + (best ? ` and held it for ${best}` : '') + '. How about you? 🚽',
+    shareText: (n, best) => `The Supreme Court of Bladder Affairs confirms: I went ${n} time${n === '1' ? '' : 's'} today`
+      + (best ? ` and held it for ${best}` : '') + '. Get your own verdict 🚽',
   },
   fa: {
     dir: 'rtl', docTitle: 'نگه داشتم — زنده', switchTo: 'English',
@@ -386,7 +575,22 @@ const T = {
     hold: 'نگه داشتم', go: 'رفتم! ‎+۱', // LRM keeps "+۱" from flipping to "۱+" in RTL
     yourDay: 'امروزِ تو', trips: 'بار امروز', gap: 'فاصله‌ی بین دفعات', best: 'رکورد نگه داشتن',
     remind: 'اگه ۳ ساعت نرفتم، خبرم کن',
+    waterOpen: '💧 آب خوردی؟ ثبتش کن', waterHide: 'جمعش کن، مثانه فهمید', waterCups: 'لیوان آب امروز', waterGoal: 'هدف لیوانی من',
+    waterProgress: 'پیشرفت آب امروز', waterUndo: 'برگشت', waterOne: '‎+۱ لیوان', waterTwo: '‎+۲ لیوان',
+    waterToast: n => `${n} لیوان رفت توی صف مثانه 😅`, waterEmpty: 'اداره‌ی آب هنوز گزارشی نداده.',
+    waterLast: (n, time) => `${n} نوبت آب خوردی · آخری ساعت ${time}`, waterDone: 'هدف پر شد؛ مثانه در جریان قرار گرفت! 🚨',
     share: 'امروزم رو به اشتراک بذار', copied: 'کپی شد!', feedTitle: 'فید زنده',
+    certCourt: 'دادگاه عالی رسیدگی به امور مثانه', certTitle: 'گواهی رسمی عملکرد روزانه',
+    certCase: n => `شماره پرونده: ${n}`,
+    certVerdictNone: 'امروز هیچ مأموریت دستشویی ثبت نشده است؛ دادگاه مدارک را برای صدور حکم کافی نمی‌داند.',
+    certVerdictHolding: n => `متهم ${n} است که نگه داشته؛ دادگاه اقدام فوری را قویاً توصیه می‌کند.`,
+    certVerdictLong: n => `مقاومت ${n} ثبت شد؛ دادگاه این میزان قهرمان‌بازی را غیرضروری تشخیص داد.`,
+    certVerdictBusy: n => `امروز ${n} مأموریت ثبت شد؛ تردد مشکوک ولی همچنان قانونی است.`,
+    certVerdictRelieved: n => `دادگاه وقوع ${n} مأموریت موفق دستشویی را در امروز تأیید می‌کند.`,
+    certTripsLabel: 'مأموریت', certHoldLabel: 'بیشترین مقاومت', certWaterLabel: 'لیوان آب',
+    certStamp: 'رسماً\nتخلیه شد', certStampNone: 'مدرک\nکافی نیست', certStampHolding: 'پرونده\nبحرانی', certStampLong: 'مقاومت\nغیرمجاز', certStampBusy: 'تردد\nمشکوک', certShare: 'اشتراک تصویر حکم', certClose: '×', certCloseLabel: 'بستن گواهی',
+    certPreparing: 'در حال آماده‌کردن مدرک…', certCopied: 'حکم دادگاه ابلاغ شد.', certDownloaded: 'تصویر حکم دانلود شد؛ بچسبانش به پست!', certShareFail: 'ابلاغ نشد؛ دوباره امتحان کن.',
+    certFooter: 'نگه داشتم · تو هم حکم مثانه‌ات را بگیر',
     liveTitle: 'همین الان', timerTitle: 'در حال مقاومت',
     how: 'جیش داری یا رفتی؟ دکمه‌شو بزن.',
     sosTitle: 'اورژانسی', sosShort: 'اورژانسی', sosFind: 'نزدیک‌ترین دستشویی رو پیدا کن',
@@ -399,11 +603,21 @@ const T = {
     sosAddOpen: '➕ اینجا دستشویی عمومی هست؟ ثبتش کن',
     sosAddNote: 'همین‌جایی که ایستادی ثبت می‌شه و برای همه‌ی آدم‌های اطراف نشون داده می‌شه. فقط جاهای عمومی؛ نه خونه و جای شخصی.',
     sosFreeLabel: 'رایگان', sosPaidLabel: 'پولی', sosFeeUnknown: 'نمی‌دونم',
+    sosTypeLabel: 'نوع سرویس', sosTypeUnknown: 'نمی‌دونم', sosTypeIranian: 'ایرانی', sosTypeWestern: 'فرنگی', sosTypeBoth: 'هر دو',
+    sosHoursLabel: 'ساعت کاری', sosHoursPh: 'اختیاری؛ مثلاً ۸ تا ۲۲ یا شبانه‌روزی',
+    sosConditionLabel: 'الان چه وضعیه؟ (اختیاری)', sosConditionUnknown: '🤷 نمی‌دونم', sosConditionUsable: '🚽 قابل استفاده', sosConditionClean: '🧼 تمیزه', sosConditionDirty: '🤢 کثیفه',
+    sosAdvanced: 'جزئیات بیشتر (اختیاری)', sosNoteLabel: 'توضیح کوتاه',
     sosNotePh: 'توضیح کوتاه، اختیاری (مثلاً: کنار مسجد)', sosAddGo: 'ثبت این‌جا',
     sosAdding: 'در حال گرفتن موقعیت…', sosAdded: 'ثبت شد. ممنون!',
     sosAddAlready: 'این‌جا رو قبلاً ثبت کردی.', sosAddLimit: 'امروز زیاد ثبت کردی. فردا دوباره امتحان کن.',
     sosAddError: 'ثبت نشد. چند لحظه‌ی دیگه دوباره بزن.',
     sosCommunity: 'ثبت‌شده توسط کاربرها', sosConfirms: n => `تأیید ${n} نفر`, sosReport: 'اشتباهه؟', sosReported: 'گزارش شد',
+    sosUpdate: 'گزارش وضعیت لحظه‌ای',
+    sosStatusLimit: 'به سقف گزارش روزانه رسیدی؛ بعداً دوباره امتحان کن.', sosStatusPending: 'گزارشت ثبت شد؛ بسته‌بودن به تأیید از یک شبکه دیگر نیاز دارد.', sosStatusSent: 'وضعیت به‌روز شد', sosStatusError: 'وضعیت ثبت نشد.', sosStatusTooFast: 'بین دو گزارش برای این مکان حداقل ۲۰ ثانیه فاصله بذار.',
+    sosAgo: n => `${n} دقیقه پیش`, sosClosedRecent: 'تازه گزارش شده که بسته است',
+    sosHours: h => `ساعت کاری: ${h}`, sosType: { iranian: 'ایرانی', western: 'فرنگی', both: 'ایرانی و فرنگی', unknown: 'نوع نامشخص' },
+    sosStatuses: { usable: '🚽 قابل استفاده', clean: '🧼 تمیز', dirty: '🤢 کثیف', closed: '🔒 بسته', paid: '💸 پولی' },
+    sosFallback: 'جست‌وجوی دستشویی در گوگل‌مپ',
     sosKinds: { fuel: 'پمپ‌بنزین', mosque: 'مسجد / نمازخانه', worship: 'عبادتگاه', hospital: 'بیمارستان', clinic: 'درمانگاه / کلینیک' },
     metres: n => `${n} متر`, kms: n => `${n} کیلومتر`,
     newsTitle: 'اخبار جیش', breaking: 'خبر فوری', anon: 'یک ناشناس',
@@ -426,6 +640,12 @@ const T = {
     nameLabel: 'اسم', namePh: 'اختیاری؛ اسم یا لقبت', someone: 'یک نفر',
     install: 'نصب اپ', holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
     toastHold: 'تایمر شروع شد. قوی باش.', toastGo: n => `ثبت شد! بار ${n}ام امروز.`,
+    feedbackOpen: 'پشتیبانی و پیشنهادات', feedbackPrivacy: 'خصوصی ارسال می‌شود؛ فقط اگر خودت اسم بنویسی ذخیره می‌شود و موقعیت و آمار روزانه هرگز فرستاده نمی‌شوند.',
+    feedbackBug: 'یه چیزی خرابه', feedbackIdea: 'یه ایده دارم', feedbackPlace: 'اطلاعات دستشویی اشتباهه', feedbackOther: 'حرف دیگه‌ای دارم',
+    feedbackNameLabel: 'اسم یا لقب (اختیاری)', feedbackNamePh: 'خالی بذار تا ناشناس بمونی',
+    feedbackPlaceholder: 'برای اداره مثانه بنویس چه خبر شده…', feedbackSend: 'بفرست برای اداره مثانه',
+    feedbackSending: 'در حال بایگانی نامه…', feedbackSent: 'نامه‌ات رسید به بایگانی مثانه؛ ممنون!',
+    feedbackShort: 'حداقل ۳ حرف بنویس.', feedbackLimit: 'صندوق امروز پر شده؛ فردا دوباره بفرست.', feedbackError: 'ارسال نشد؛ دوباره امتحان کن.',
     footer: 'بدون ثبت‌نام. آمارت فقط توی همین مرورگر می‌مونه.',
     feedEmpty: 'هنوز کسی نیست. اولین نفر باش.',
     titles: ['سطح: تازه‌کار', 'سطح: مصمم', 'سطح: مثانه‌ی فولادی', 'سطح: قهرمان ملی 🏅',
@@ -436,8 +656,8 @@ const T = {
     fNth: (mine, n) => mine ? `تو امروز برای بار ${n}ام رفتی 🏆` : `یک نفر امروز برای بار ${n}ام رفت 🏆`,
     fAfter: (mine, n) => mine ? `تو بعد از ${n} دقیقه بالاخره رفتی 😅` : `یک نفر بعد از ${n} دقیقه بالاخره رفت 😅`,
     fGo: mine => mine ? 'تو همین الان رفتی 🚽' : 'یک نفر همین الان رفت 🚽',
-    shareText: (n, best) => `امروز ${n} بار رفتم دستشویی`
-      + (best ? ` و ${best} نگه داشتم` : '') + '. تو چی؟ 🚽',
+    shareText: (n, best) => `دادگاه عالی امور مثانه تأیید می‌کند: امروز ${n} بار رفتم دستشویی`
+      + (best ? ` و ${best} نگه داشتم` : '') + '. تو هم حکمت را بگیر 🚽',
   },
 };
 
@@ -450,6 +670,8 @@ document.documentElement.lang = lang;
 document.documentElement.dir = t.dir;
 document.title = t.docTitle;
 for (const el of document.querySelectorAll('[data-t]')) el.textContent = t[el.dataset.t];
+$('waterTrack').setAttribute('aria-label', t.waterProgress);
+$('certClose').setAttribute('aria-label', t.certCloseLabel);
 $('date').textContent = new Date().toLocaleDateString(lang === 'fa' ? 'fa-IR' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 // Pixel-art icons: each string is a row of the bitmap, '#' is a filled pixel.
 const ICONS = {
@@ -492,7 +714,12 @@ console.assert(Object.keys(T.en).join() === Object.keys(T.fa).join(), 'languages
 // ---- personal state (this browser only) ----
 let me = { day: null, trips: [], bestHold: 0, holdingSince: null };
 try { me = JSON.parse(localStorage.getItem('holdingit')) ?? me; } catch {}
-if (me.holdingSince && Date.now() - me.holdingSince > HOLD_EXPIRY) me.holdingSince = null;
+// Migrate the first, count-only water tracker to timestamped millilitre entries.
+if (!Array.isArray(me.waterLog)) me.waterLog = Array.from({ length: me.water ?? 0 }, () => ({ ml: 250, at: Date.now() }));
+me.waterGoal = [1500, 2000, 2500, 3000].includes(me.waterGoal) ? me.waterGoal : 2000;
+// Keep an active personal timer across reloads and day changes until the user logs a trip.
+// Reject malformed saved timestamps without expiring valid long-running timers.
+if (!Number.isFinite(me.holdingSince) || me.holdingSince <= 0 || me.holdingSince > Date.now()) me.holdingSince = null;
 const save = () => { try { localStorage.setItem('holdingit', JSON.stringify(me)); } catch {} };
 
 // ---- shared live state (Supabase) ----
@@ -536,6 +763,7 @@ function renderFeed(feed) {
     // A line with a name reads "Ali went" for everyone, its owner included (still marked 🫵);
     // "You went" is only for the owner's own lines that have no name.
     const you = mine && !e.name;
+    const content = document.createElement('span');
     const text = e.type === 'hold' ? t.fHold(you)
       : e.nth >= 5 ? t.fNth(you, lang === 'en' ? ordinal(e.nth) : num(e.nth))
       : e.held_mins ? t.fAfter(you, num(e.held_mins))
@@ -545,15 +773,16 @@ function renderFeed(feed) {
     // into one left-to-right run and end up after the name instead of before it.
     const flag = document.createElement('bdi');
     flag.textContent = mine ? '🫵' : flagOf(e.country);
-    li.append(flag, ' ');
+    content.append(flag, ' ');
     if (e.name) {
       const [before, ...after] = text.split(t.someone);
       const name = document.createElement('bdi');
       name.textContent = e.name;
-      li.append(before, name, after.join(t.someone));
+      content.append(before, name, after.join(t.someone));
     } else {
-      li.append(text);
+      content.append(text);
     }
+    li.append(content);
     if (mine) li.classList.add('me');
     if (e.id > lastFeedId) li.classList.add('new'); // only lines that just arrived slide in
     return li;
@@ -644,13 +873,19 @@ async function search({ q, types, radius, limit }, lat, lon) {
   return (await r.json())
     // Churches and temples rarely have a public toilet; mosques do. Places with no religion tag stay.
     .filter(x => types.includes(x.type) && (!x.extratags?.religion || x.extratags.religion === 'muslim'))
-    .map(x => ({ name: x.name || '', tags: x.extratags ?? {}, pos: [+x.lat, +x.lon], dist: metres([lat, lon], [+x.lat, +x.lon]) }))
+    .map(x => {
+      const tags = x.extratags ?? {};
+      const position = tags['toilets:position'];
+      tags.toiletType = /squat/.test(position) && /seated/.test(position) ? 'both' : /squat/.test(position) ? 'iranian' : /seated/.test(position) ? 'western' : 'unknown';
+      return { name: x.name || '', tags, pos: [+x.lat, +x.lon], dist: metres([lat, lon], [+x.lat, +x.lon]) };
+    })
     .sort((a, b) => a.dist - b.dist);
 }
 
 function placeRow({ kind, name, tags, pos, dist, community }) {
   const label = kind === 'toilet' ? t.sosToilet : kind === 'worship' ? (tags.religion === 'muslim' ? t.sosKinds.mosque : t.sosKinds.worship) : t.sosKinds[kind];
   const li = document.createElement('li');
+  li.className = 'place';
   const title = document.createElement('b');
   title.append(bdi(name || label));
   const meta = document.createElement('span');
@@ -663,14 +898,58 @@ function placeRow({ kind, name, tags, pos, dist, community }) {
     tags.fee === 'yes' ? t.sosFee : tags.fee === 'no' ? t.sosFree : null,
     tags.wheelchair === 'yes' ? '♿' : null,
   ].filter(Boolean).join(' · ');
+  const badges = document.createElement('span');
+  badges.className = 'badges';
+  const addBadge = (text, cls = '') => {
+    if (!text) return;
+    const badge = document.createElement('span'); badge.className = `badge ${cls}`; badge.textContent = text; badges.append(badge); return badge;
+  };
+  addBadge(tags.fee === 'yes' ? `💸 ${t.sosFee}` : tags.fee === 'no' ? `🟢 ${t.sosFree}` : '');
+  addBadge(tags.toiletType && tags.toiletType !== 'unknown' ? `🚽 ${t.sosType[tags.toiletType]}` : '');
+  addBadge(tags.opening_hours ? `🕐 ${t.sosHours(tags.opening_hours)}` : '');
+  let liveBadge;
+  if (community?.lastStatus) {
+    const mins = Math.max(0, Math.round((Date.now() - new Date(community.lastReportedAt)) / MIN));
+    liveBadge = addBadge(`${t.sosStatuses[community.lastStatus]} · ${t.sosAgo(num(mins))}`,
+      ['usable', 'clean'].includes(community.lastStatus) ? 'good' : community.lastStatus === 'paid' ? 'money' : 'bad');
+    if (community.lastStatus === 'closed' && mins <= 120) li.classList.add('closed');
+  }
   const go = document.createElement('a');   // hands the route to the phone's own maps app
   go.className = 'btn small';
   go.href = `https://www.google.com/maps/dir/?api=1&destination=${pos[0]},${pos[1]}&travelmode=walking`;
   go.target = '_blank';
   go.rel = 'noopener';
   go.textContent = t.sosGo;
-  li.append(title, go, meta);
+  li.append(title, go, meta, badges);
+  const tools = document.createElement('span');
+  tools.className = 'place-tools';
+  li.append(tools);
   if (community) {   // anyone can flag a wrong place; three different browsers hide it
+    const toggle = document.createElement('button');
+    toggle.className = 'status-toggle'; toggle.textContent = t.sosUpdate; tools.append(toggle);
+    const box = document.createElement('span'); box.className = 'status-box'; box.hidden = true;
+    const actions = document.createElement('span'); actions.className = 'status-actions';
+    const feedback = document.createElement('span'); feedback.className = 'muted';
+    for (const [status, labelText] of Object.entries(t.sosStatuses)) {
+      const action = document.createElement('button'); action.type = 'button'; action.textContent = labelText.split(' ')[0]; action.title = labelText;
+      action.setAttribute('aria-label', labelText);
+      action.onclick = async () => {
+        [...actions.children].forEach(b => b.disabled = true); feedback.textContent = '…';
+        try {
+          const result = await rpc('report_status', { p_session: session, p_place_id: community.id, p_status: status });
+          community.lastStatus = result.status; community.lastReportedAt = result.reported_at;
+          liveBadge?.remove();
+          liveBadge = result.status ? addBadge(`${t.sosStatuses[result.status]} · ${t.sosAgo(num(Math.max(0, Math.round((Date.now() - new Date(result.reported_at)) / MIN))))}`,
+            ['usable', 'clean'].includes(result.status) ? 'good' : result.status === 'paid' ? 'money' : 'bad') : null;
+          li.classList.toggle('closed', result.status === 'closed');
+          feedback.textContent = status === 'closed' && result.status !== 'closed' ? t.sosStatusPending : t.sosStatusSent; setTimeout(() => pulse(), 300);
+        } catch (error) { feedback.textContent = /too fast/.test(error.message) ? t.sosStatusTooFast : /limit/.test(error.message) ? t.sosStatusLimit : t.sosStatusError; }
+        [...actions.children].forEach(b => b.disabled = false);
+      };
+      actions.append(action);
+    }
+    box.append(actions, feedback); toggle.onclick = () => { box.hidden = !box.hidden; };
+    li.append(box);
     const report = document.createElement('button');
     report.className = 'report';
     report.textContent = t.sosReport;
@@ -687,6 +966,7 @@ function placeRow({ kind, name, tags, pos, dist, community }) {
 function setStatus(text, warn = false) {
   $('sosStatus').textContent = text;
   $('sosStatus').classList.toggle('warn', warn && !!text);
+  $('sosFallback').hidden = !(warn && !!text);
 }
 
 // found: places so far (each with its kind); done: every search has finished; failed: kinds whose search errored;
@@ -714,9 +994,13 @@ function showPlaces(found, done, failed, widened, where) {
 
 $('sosBtn').onclick = () => {
   $('sosList').replaceChildren();
+  $('sosFallback').textContent = t.sosFallback;
+  $('sosFallback').href = 'https://www.google.com/maps/search/?api=1&query=public+toilet';
   if (!navigator.geolocation) { setStatus(t.sosNoGeo, true); return; }
   setStatus(t.sosLocating);
   navigator.geolocation.getCurrentPosition(async ({ coords: { latitude, longitude } }) => {
+    $('sosFallback').textContent = t.sosFallback;
+    $('sosFallback').href = `https://www.google.com/maps/search/?api=1&query=public+toilet+near+${latitude},${longitude}`;
     setStatus(t.sosSearching);
     const where = `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
     const found = [], failed = new Set(), have = new Set();
@@ -726,8 +1010,9 @@ $('sosBtn').onclick = () => {
       const mine = await rpc('places_near', { p_lat: latitude, p_lon: longitude, p_radius: 5000 });
       found.push(...mine.map(r => ({
         kind: 'toilet', name: r.note || '', pos: [r.lat, r.lon], dist: metres([latitude, longitude], [r.lat, r.lon]),
-        tags: { fee: r.fee === 'free' ? 'no' : r.fee === 'paid' ? 'yes' : undefined },
-        community: { id: r.id, confirms: r.confirms },
+        tags: { fee: r.fee === 'free' ? 'no' : r.fee === 'paid' ? 'yes' : undefined,
+          toiletType: r.toilet_type, opening_hours: r.opening_hours },
+        community: { id: r.id, confirms: r.confirms, lastStatus: r.last_status, lastReportedAt: r.last_reported_at },
       })));
       if (found.length) showPlaces(found, false, [], false, where);
     } catch {}   // our database being unreachable must not stop the map search
@@ -750,6 +1035,9 @@ $('sosBtn').onclick = () => {
   { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 });
 };
 $('sosNoteIn').placeholder = t.sosNotePh;
+$('sosHoursIn').placeholder = t.sosHoursPh;
+$('feedbackMessage').placeholder = t.feedbackPlaceholder;
+$('feedbackName').placeholder = t.feedbackNamePh;
 $('sosAddBtn').onclick = () => {
   const status = $('sosAddStatus');
   if (!navigator.geolocation) { status.textContent = t.sosNoGeo; return; }
@@ -757,12 +1045,17 @@ $('sosAddBtn').onclick = () => {
   $('sosAddBtn').disabled = true;
   navigator.geolocation.getCurrentPosition(async ({ coords }) => {
     try {
-      await rpc('add_place', {
+      const placeId = await rpc('add_place_with_details', {
         p_session: session, p_lat: coords.latitude, p_lon: coords.longitude,
         p_fee: document.querySelector('input[name=fee]:checked').value, p_note: $('sosNoteIn').value.trim() || null,
+        p_toilet_type: $('sosTypeIn').value, p_opening_hours: $('sosHoursIn').value.trim() || null,
       });
+      const initialStatus = document.querySelector('input[name=initialStatus]:checked')?.value ?? '';
+      if (initialStatus) await rpc('report_status', { p_session: session, p_place_id: placeId, p_status: initialStatus }).catch(() => {});
       status.textContent = t.sosAdded;
       $('sosNoteIn').value = '';
+      $('sosHoursIn').value = ''; $('sosTypeIn').value = 'unknown';
+      document.querySelectorAll('input[name=initialStatus]').forEach(input => input.checked = false);
     } catch (e) {
       status.textContent = /already/.test(e.message) ? t.sosAddAlready : /limit/.test(e.message) ? t.sosAddLimit : t.sosAddError;
     }
@@ -827,11 +1120,37 @@ function splash(btn) {
     document.body.append(d);
   }
 }
+function releaseBalloons() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#ff7a6b', '#ffd23f', '#3fd0bd', '#c3adff', '#ff9ebb', '#5cc8ff'];
+  for (let i = 0; i < 10; i++) {
+    const balloon = document.createElement('i'); balloon.className = 'balloon';
+    const sway = Math.random() * 70 - 35;
+    balloon.style.cssText = `--bx:${5 + Math.random() * 88}vw;--bc:${colors[i % colors.length]};--bd:${Math.random() * .35}s;--bs:${sway}px;--be:${sway * -.5}px`;
+    balloon.onanimationend = () => balloon.remove(); document.body.append(balloon);
+  }
+}
+function playApplause() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    for (let i = 0; i < 11; i++) {
+      const length = Math.floor(ctx.sampleRate * .045), buffer = ctx.createBuffer(1, length, ctx.sampleRate), data = buffer.getChannelData(0);
+      for (let j = 0; j < length; j++) data[j] = (Math.random() * 2 - 1) * (1 - j / length);
+      const source = ctx.createBufferSource(), filter = ctx.createBiquadFilter(), gain = ctx.createGain();
+      source.buffer = buffer; filter.type = 'bandpass'; filter.frequency.value = 900 + Math.random() * 900; filter.Q.value = .7;
+      gain.gain.value = .07 + Math.random() * .035; source.connect(filter).connect(gain).connect(ctx.destination);
+      source.start(ctx.currentTime + i * .075 + Math.random() * .035);
+    }
+    setTimeout(() => ctx.close(), 1200);
+  } catch {}
+}
 
 function render() {
   // New day: reset the daily stats. Checked on every render, so an app left open overnight resets too.
   const day = new Date().toDateString();
-  if (me.day !== day) { me = { ...me, day, trips: [], bestHold: 0 }; save(); }
+  if (me.day !== day) { me = { ...me, day, trips: [], bestHold: 0, water: 0, waterLog: [] }; save(); }
   const holding = me.holdingSince !== null;
   const live = n => n === null ? '–' : num(n.toLocaleString('en'));
   setNum('inToilet', live(world.inToilet));
@@ -843,7 +1162,6 @@ function render() {
   $('holdLabel').textContent = holding ? t.holdingNow : t.hold;
   if (holding) {
     const ms = Date.now() - me.holdingSince;
-    if (ms > HOLD_EXPIRY) { me.holdingSince = null; save(); return render(); }
     const s = Math.floor(ms / 1000);
     // Latin digits in both languages: the Persian zero is a tiny dot, so ۰۰:۰۰ is hard to read as a clock
     $('timer').textContent = [Math.floor(s / 60), s % 60].map(n => String(n).padStart(2, '0')).join(':');
@@ -865,6 +1183,18 @@ function render() {
   }
   const gap = avgGap(me.trips);
   setNum('sCount', num(me.trips.length));
+  const waterLog = Array.isArray(me.waterLog) ? me.waterLog : [];
+  const waterTotal = waterLog.reduce((sum, entry) => sum + entry.ml, 0);
+  const waterCups = waterTotal / 250;
+  setNum('waterTotal', num(waterCups));
+  $('waterGoal').value = String(me.waterGoal);
+  const waterPercent = Math.min(100, Math.round(waterTotal / me.waterGoal * 100));
+  $('waterProgress').style.width = `${waterPercent}%`;
+  $('waterProgress').parentElement.setAttribute('aria-valuemax', me.waterGoal / 250);
+  $('waterProgress').parentElement.setAttribute('aria-valuenow', waterCups);
+  $('waterUndo').disabled = !waterLog.length;
+  $('waterMeta').textContent = waterTotal >= me.waterGoal ? t.waterDone : !waterLog.length ? t.waterEmpty
+    : t.waterLast(num(waterLog.length), new Date(waterLog.at(-1).at).toLocaleTimeString(lang === 'fa' ? 'fa-IR' : 'en-GB', { hour: '2-digit', minute: '2-digit' }));
   const dur = ms => ms >= MIN ? fmtMin(ms) : '–'; // under a minute is noise, not a stat
   $('sGap').textContent = gap === null ? '–' : dur(gap);
   $('sBest').textContent = dur(me.bestHold);
@@ -879,8 +1209,23 @@ $('goBtn').onclick = () => {
   me.bestHold = Math.max(me.bestHold, held);
   me.holdingSince = null;
   me.trips.push(Date.now());
-  save(); publish('go', Math.floor(held / MIN)); render(); toast(t.toastGo(num(me.trips.length))); splash($('goBtn'));
+  save(); publish('go', Math.floor(held / MIN)); render(); toast(t.toastGo(num(me.trips.length)));
+  splash($('goBtn')); releaseBalloons(); playApplause();
 };
+function addWater(cups) {
+  me.waterLog = [...(me.waterLog ?? []), { ml: cups * 250, at: Date.now() }];
+  delete me.water; save(); render(); toast(t.waterToast(num(cups)));
+}
+$('waterOpen').onclick = () => {
+  const opening = $('waterCard').hidden;
+  $('waterCard').hidden = !opening;
+  $('waterOpen').setAttribute('aria-expanded', String(opening));
+  $('waterOpen').textContent = opening ? t.waterHide : t.waterOpen;
+};
+$('water250').onclick = () => addWater(1);
+$('water500').onclick = () => addWater(2);
+$('waterUndo').onclick = () => { if (!me.waterLog?.length) return; me.waterLog.pop(); save(); render(); };
+$('waterGoal').onchange = e => { me.waterGoal = Number(e.target.value); save(); render(); };
 
 // Optional nickname, kept on this device and sent with each button press.
 $('name').placeholder = t.namePh;
@@ -896,15 +1241,167 @@ $('remind').onchange = e => {
   if (me.remind && window.Notification?.permission === 'default') Notification.requestPermission();
 };
 
-const shareText = () => t.shareText(num(me.trips.length), me.bestHold >= MIN ? fmtMin(me.bestHold) : '');
-$('shareBtn').onclick = async () => {
-  const data = { text: shareText(), url: location.href };
+$('feedbackSend').onclick = async () => {
+  const message = $('feedbackMessage').value.trim(), status = $('feedbackStatus');
+  if (message.length < 3) { status.textContent = t.feedbackShort; return; }
+  $('feedbackSend').disabled = true; status.textContent = t.feedbackSending;
   try {
-    if (navigator.share) return await navigator.share(data);
-    await navigator.clipboard.writeText(`${data.text} ${data.url}`);
-    $('shareLabel').textContent = t.copied;
-    setTimeout(() => $('shareLabel').textContent = t.share, 1500);
-  } catch {} // user closed the share sheet, or clipboard is blocked
+    await rpc('submit_feedback', {
+      p_session: session,
+      p_kind: document.querySelector('input[name=feedbackKind]:checked').value,
+      p_message: message, p_name: $('feedbackName').value.trim() || null, p_lang: lang, p_app_version: APP_VERSION,
+    });
+    $('feedbackMessage').value = ''; $('feedbackName').value = ''; status.textContent = t.feedbackSent;
+  } catch (error) {
+    status.textContent = /limit/.test(error.message) ? t.feedbackLimit : t.feedbackError;
+  }
+  $('feedbackSend').disabled = false;
+};
+
+const shareText = () => t.shareText(num(me.trips.length), me.bestHold >= MIN ? fmtMin(me.bestHold) : '');
+function playGavel() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    for (const delay of [0, .13]) {
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = 'triangle'; osc.frequency.setValueAtTime(delay ? 82 : 105, ctx.currentTime + delay);
+      osc.frequency.exponentialRampToValueAtTime(48, ctx.currentTime + delay + .12);
+      gain.gain.setValueAtTime(.0001, ctx.currentTime + delay);
+      gain.gain.exponentialRampToValueAtTime(.32, ctx.currentTime + delay + .006);
+      gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + delay + .16);
+      osc.connect(gain).connect(ctx.destination); osc.start(ctx.currentTime + delay); osc.stop(ctx.currentTime + delay + .17);
+    }
+    setTimeout(() => ctx.close(), 500);
+  } catch {}
+}
+function certificateConfetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const paper = document.querySelector('.certificate');
+  const colors = ['#ff7a6b', '#ffd23f', '#3fd0bd', '#c3adff', '#ff9ebb'];
+  for (let i = 0; i < 18; i++) {
+    const bit = document.createElement('i'); bit.className = 'cert-confetti';
+    const angle = Math.PI * 2 * i / 18, distance = 90 + Math.random() * 130;
+    bit.style.cssText = `--confetti:${colors[i % colors.length]};--cx:${Math.cos(angle) * distance}px;--cy:${Math.sin(angle) * distance}px;--cr:${Math.random() * 720 - 360}deg`;
+    bit.onanimationend = () => bit.remove(); paper.append(bit);
+  }
+}
+let certificateTimers = [];
+function clearCertificateTimers() {
+  certificateTimers.forEach(clearTimeout); certificateTimers = [];
+}
+function certificateRuling() {
+  const trips = me.trips.length;
+  if (me.holdingSince) return { stamp: t.certStampHolding, verdict: t.certVerdictHolding(fmtMin(Date.now() - me.holdingSince)) };
+  if (!trips) return { stamp: t.certStampNone, verdict: t.certVerdictNone };
+  if (me.bestHold >= 45 * MIN) return { stamp: t.certStampLong, verdict: t.certVerdictLong(fmtMin(me.bestHold)) };
+  if (trips >= 5) return { stamp: t.certStampBusy, verdict: t.certVerdictBusy(num(trips)) };
+  return { stamp: t.certStamp, verdict: t.certVerdictRelieved(num(trips)) };
+}
+function openCertificate() {
+  const waterCups = (me.waterLog ?? []).reduce((sum, entry) => sum + entry.ml, 0) / 250;
+  const caseId = `${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${session.slice(-4).toUpperCase()}`;
+  const ruling = certificateRuling();
+  $('certCase').textContent = t.certCase(caseId);
+  $('certVerdict').textContent = ruling.verdict;
+  $('certStamp').textContent = ruling.stamp;
+  $('certTrips').textContent = num(me.trips.length);
+  $('certHold').textContent = me.bestHold >= MIN ? fmtMin(me.bestHold) : '–';
+  $('certWater').textContent = num(waterCups);
+  $('certStatus').textContent = '';
+  const dialog = $('certificateDialog');
+  if (dialog.showModal) dialog.showModal(); else dialog.setAttribute('open', '');
+  clearCertificateTimers();
+  const paper = document.querySelector('.certificate');
+  paper.classList.remove('reveal'); void paper.offsetWidth; paper.classList.add('reveal');
+  $('certStamp').classList.remove('hit');
+  certificateTimers.push(setTimeout(() => {
+    $('certStamp').classList.add('hit');
+    playGavel(); certificateConfetti();
+  }, 650));
+}
+$('shareBtn').onclick = openCertificate;
+$('certificateDialog').addEventListener('close', clearCertificateTimers);
+$('certClose').onclick = () => {
+  clearCertificateTimers();
+  if ($('certificateDialog').close) $('certificateDialog').close(); else $('certificateDialog').removeAttribute('open');
+};
+async function certificateImage() {
+  const font = lang === 'fa' ? 'Vazirmatn' : 'Fredoka';
+  if (document.fonts) {
+    // Include the actual text so unicode-range subsets (including Persian digits) load too.
+    const sample = [$('certCase').textContent, $('certVerdict').textContent,
+      $('certTrips').textContent, $('certHold').textContent, $('certWater').textContent,
+      $('certStamp').textContent, t.certCourt, t.certTitle, t.certTripsLabel,
+      t.certHoldLabel, t.certWaterLabel, t.certFooter,
+      new Date().toLocaleDateString(lang === 'fa' ? 'fa-IR' : 'en-GB')].join(' ');
+    await Promise.all([400, 500, 700, 800].map(weight =>
+      document.fonts.load(`${weight} 32px "${font}"`, sample)));
+    await document.fonts.ready;
+  }
+  const canvas = document.createElement('canvas'); canvas.width = 1080; canvas.height = 1350;
+  const c = canvas.getContext('2d'); c.direction = t.dir;
+  c.fillStyle = '#fff8df'; c.fillRect(0, 0, canvas.width, canvas.height);
+  c.strokeStyle = '#2a1a4a'; c.lineWidth = 8; c.strokeRect(34, 34, 1012, 1282);
+  c.lineWidth = 2; c.strokeRect(52, 52, 976, 1246);
+  c.strokeStyle = '#2a1a4a18'; c.lineWidth = 1;
+  for (let y = 90; y < 1300; y += 42) { c.beginPath(); c.moveTo(54, y); c.lineTo(1026, y); c.stroke(); }
+  const center = 540;
+  c.textAlign = 'center'; c.fillStyle = '#2a1a4a';
+  c.font = `700 30px ${font}`; c.fillText(t.certCourt, center, 125);
+  c.font = `800 55px ${font}`; c.fillText(t.certTitle, center, 205);
+  c.font = `400 24px ${font}`; c.fillText($('certCase').textContent, center, 255);
+  function wrapped(text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' '), lines = []; let line = '';
+    for (const word of words) {
+      const test = line ? `${line} ${word}` : word;
+      if (c.measureText(test).width > maxWidth && line) { lines.push(line); line = word; } else line = test;
+    }
+    if (line) lines.push(line);
+    lines.forEach((value, i) => c.fillText(value, x, y + i * lineHeight));
+  }
+  c.strokeStyle = '#2a1a4a'; c.lineWidth = 2; c.beginPath(); c.moveTo(120, 300); c.lineTo(960, 300); c.stroke();
+  c.font = `700 32px ${font}`; wrapped($('certVerdict').textContent, center, 355, 800, 52);
+  c.beginPath(); c.moveTo(120, 490); c.lineTo(960, 490); c.stroke();
+  const statX = [260, 540, 820], statValue = [$('certTrips').textContent, $('certHold').textContent, $('certWater').textContent];
+  const statLabel = [t.certTripsLabel, t.certHoldLabel, t.certWaterLabel];
+  for (let i = 0; i < 3; i++) {
+    c.font = `800 52px ${font}`; c.fillText(statValue[i], statX[i], 590);
+    c.font = `500 24px ${font}`; c.fillText(statLabel[i], statX[i], 635);
+  }
+  c.save(); c.translate(center, 850); c.rotate(-13 * Math.PI / 180);
+  c.strokeStyle = '#ba2636'; c.fillStyle = '#ba2636'; c.lineWidth = 9; c.beginPath(); c.arc(0, 0, 145, 0, Math.PI * 2); c.stroke();
+  c.lineWidth = 3; c.beginPath(); c.arc(0, 0, 126, 0, Math.PI * 2); c.stroke();
+  c.font = `800 34px ${font}`; c.textAlign = 'center';
+  $('certStamp').textContent.split('\n').forEach((line, i) => c.fillText(line, 0, -5 + i * 42)); c.restore();
+  c.fillStyle = '#2a1a4a'; c.textAlign = 'center'; c.font = `700 25px ${font}`;
+  c.fillText(t.certFooter, center, 1175);
+  c.font = `400 22px ${font}`; c.fillText(new Date().toLocaleDateString(lang === 'fa' ? 'fa-IR' : 'en-GB'), center, 1225);
+  return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('image')), 'image/png'));
+}
+$('certShare').onclick = async () => {
+  const data = { text: `${t.certTitle}\n${shareText()}` };
+  if (/^https?:/.test(location.href)) data.url = location.href;
+  $('certStatus').textContent = t.certPreparing;
+  $('certShare').disabled = true;
+  try {
+    const blob = await certificateImage();
+    const filename = 'holding-it-verdict.png';
+    const file = typeof File === 'function' ? new File([blob], filename, { type: 'image/png' }) : null;
+    if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ ...data, files: [file] });
+      $('certStatus').textContent = t.certCopied;
+    } else {
+      const url = URL.createObjectURL(blob), link = document.createElement('a');
+      link.href = url; link.download = filename; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText([data.text, data.url].filter(Boolean).join(' ')).catch(() => {});
+      $('certStatus').textContent = t.certDownloaded;
+    }
+  } catch (error) {
+    if (error.name !== 'AbortError') $('certStatus').textContent = t.certShareFail;
+  }
+  $('certShare').disabled = false;
 };
 
 // ---- installable app ----

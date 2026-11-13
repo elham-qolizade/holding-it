@@ -1,12 +1,15 @@
 // Service worker: makes the page installable and usable offline.
-const CACHE = 'holding-it-v1';
+const CACHE = 'holding-it-v21';
 const SHELL = ['./', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
   self.skipWaiting();
 });
-self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
+self.addEventListener('activate', event => event.waitUntil(
+  caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+    .then(() => self.clients.claim())
+));
 
 // Network first, so a new deploy shows up at once; the cache is only the offline fallback.
 // Fonts come from another origin and are not cached: offline, the page falls back to system fonts.
