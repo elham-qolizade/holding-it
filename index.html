@@ -105,6 +105,14 @@
   @keyframes blink { 50% { background: transparent; } }
   .total { margin: 0; padding: 8px 16px; border-top: 1px solid var(--ink); text-align: center; font-size: 0.82rem; text-transform: uppercase; letter-spacing: .03em; }
 
+  .namerow { display: flex; align-items: center; gap: 10px; font: 600 1.05rem/1 var(--pixel); }
+  :lang(fa) .namerow { font-size: 1.3rem; }
+  .namerow input {
+    flex: 1; min-width: 0; min-height: 44px; padding: 6px 12px;
+    background: var(--panel); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px;
+    box-shadow: inset 2px 2px 0 #2a1a4a22; font: 1rem/1.3 var(--type);
+  }
+  .namerow input:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
   .buttons { display: grid; gap: 14px; }
   button { font: inherit; color: var(--ink); cursor: pointer; }
   .btn {
@@ -191,6 +199,11 @@
     <p class="total"><b id="todayTotal">–</b> <span data-t="total"></span></p>
   </section>
 
+  <label class="namerow">
+    <span data-t="nameLabel"></span>
+    <input id="name" maxlength="16" autocomplete="nickname" enterkeyhint="done">
+  </label>
+
   <section class="buttons">
     <button id="holdBtn" class="btn"><span class="px" data-icon="hourglass"></span><span data-t="hold" id="holdLabel"></span></button>
     <button id="goBtn" class="btn primary"><span class="px" data-icon="toilet"></span><span data-t="go"></span></button>
@@ -250,6 +263,7 @@ const T = {
     share: 'Share my day', copied: 'Copied!', feedTitle: 'Live feed',
     liveTitle: 'Right now', timerTitle: 'Resisting',
     how: 'Need to go, or just went? Tap a button.',
+    nameLabel: 'Name', namePh: 'optional: your name or a nickname', someone: 'Someone',
     install: 'Install app', holdingNow: 'Holding…', collapse: 'Collapse window',
     toastHold: 'Timer started. Stay strong.', toastGo: n => `Logged! Trip #${n} today.`,
     footer: 'No sign-up. Your stats stay in this browser.',
@@ -277,6 +291,7 @@ const T = {
     share: 'امروزم رو به اشتراک بذار', copied: 'کپی شد!', feedTitle: 'فید زنده',
     liveTitle: 'همین الان', timerTitle: 'در حال مقاومت',
     how: 'جیش داری یا رفتی؟ دکمه‌شو بزن.',
+    nameLabel: 'اسم', namePh: 'اختیاری؛ اسم یا لقبت', someone: 'یک نفر',
     install: 'نصب اپ', holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
     toastHold: 'تایمر شروع شد. قوی باش.', toastGo: n => `ثبت شد! بار ${n}ام امروز.`,
     footer: 'بدون ثبت‌نام. آمارت فقط توی همین مرورگر می‌مونه.',
@@ -386,7 +401,9 @@ function renderFeed(feed) {
       : e.nth >= 5 ? t.fNth(mine, lang === 'en' ? ordinal(e.nth) : num(e.nth))
       : e.held_mins ? t.fAfter(mine, num(e.held_mins))
       : t.fGo(mine);
-    li.textContent = `${mine ? '🫵' : flagOf(e.country)} ${text}`;
+    // Other people's lines start with "Someone"; swap in their nickname when they gave one.
+    const line = !mine && e.name ? text.replace(t.someone, e.name) : text;
+    li.textContent = `${mine ? '🫵' : flagOf(e.country)} ${line}`;
     if (mine) li.classList.add('me');
     if (e.id > lastFeedId) li.classList.add('new'); // only lines that just arrived slide in
     return li;
@@ -412,7 +429,7 @@ async function pulse() {
 
 async function publish(type, heldMins = 0) {
   try {
-    const id = await rpc('log_event', { p_session: session, p_type: type, p_held_mins: heldMins });
+    const id = await rpc('log_event', { p_session: session, p_type: type, p_held_mins: heldMins, p_name: me.name || null });
     myIds = [...myIds, id].slice(-30);
     try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
   } catch {} // offline or rate limited: the personal stats above still count on this device
@@ -503,6 +520,11 @@ $('goBtn').onclick = () => {
   me.trips.push(Date.now());
   save(); publish('go', Math.floor(held / MIN)); render(); toast(t.toastGo(num(me.trips.length))); splash($('goBtn'));
 };
+
+// Optional nickname, kept on this device and sent with each button press.
+$('name').placeholder = t.namePh;
+$('name').value = me.name ?? '';
+$('name').oninput = e => { me.name = e.target.value.trim().slice(0, 16); save(); };
 
 $('remind').checked = !!me.remind;
 $('remind').onchange = e => {

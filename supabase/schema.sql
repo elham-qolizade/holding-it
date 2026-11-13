@@ -25,6 +25,8 @@ create table if not exists public.events (
   ip_hash    text not null,                              -- salted, changes daily; the IP itself is never stored
   created_at timestamptz not null default now()
 );
+-- Optional nickname the visitor chose (added after launch, so it is a separate statement).
+alter table public.events add column if not exists name text;
 create index if not exists events_created_idx on public.events (created_at);
 create index if not exists events_session_idx on public.events (session, created_at desc);
 create index if not exists events_ip_idx      on public.events (ip_hash, created_at);
@@ -32,7 +34,9 @@ create index if not exists events_ip_idx      on public.events (ip_hash, created
 alter table public.events enable row level security;
 revoke all on table public.events from anon, authenticated;
 
-create or replace function public.log_event(p_session uuid, p_type text, p_held_mins int default 0)
+-- The nickname parameter was added later; drop the old 3-argument version so calls are not ambiguous.
+drop function if exists public.log_event(uuid, text, int);
+create or replace function public.log_event(p_session uuid, p_type text, p_held_mins int default 0, p_name text default null)
 returns bigint
 language plpgsql
 security definer
@@ -45,6 +49,8 @@ declare
   v_hash    text;
   v_nth     int;
   v_id      bigint;
+  -- Nickname: no control characters, single spaces, at most 16 characters, empty means none.
+  v_name    text := nullif(left(btrim(regexp_replace(regexp_replace(coalesce(p_name, ''), '[[:cntrl:]]', '', 'g'), '\s+', ' ', 'g')), 16), '');
 begin
   if p_type not in ('hold', 'go') then
     raise exception 'bad type';
@@ -79,10 +85,10 @@ begin
     where session = p_session and type = 'go' and created_at > now() - interval '18 hours';
   end if;
 
-  insert into public.events (session, type, held_mins, nth, country, ip_hash)
+  insert into public.events (session, type, held_mins, nth, country, ip_hash, name)
   values (p_session, p_type,
           case when p_type = 'go' then greatest(0, least(coalesce(p_held_mins, 0), 180)) end,
-          v_nth, v_country, v_hash)
+          v_nth, v_country, v_hash, v_name)
   returning id into v_id;
 
   -- Housekeeping: now and then, drop rows older than a week.
@@ -113,12 +119,12 @@ as $$
     'today',     (select count(*) from public.events
                   where type = 'go' and created_at > now() - interval '24 hours'),
     'feed',      (select coalesce(json_agg(f), '[]'::json) from (
-                    select id, type, held_mins, nth, country from public.events
+                    select id, type, held_mins, nth, country, name from public.events
                     order by id desc limit 8) f)
   );
 $$;
 
-revoke all on function public.log_event(uuid, text, int) from public;
+revoke all on function public.log_event(uuid, text, int, text) from public;
 revoke all on function public.pulse() from public;
-grant execute on function public.log_event(uuid, text, int) to anon, authenticated;
+grant execute on function public.log_event(uuid, text, int, text) to anon, authenticated;
 grant execute on function public.pulse() to anon, authenticated;
