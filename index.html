@@ -331,7 +331,6 @@
   <button id="langBtn" data-t="switchTo"></button>
   <button id="installBtn" data-t="install" hidden></button>
   <button id="sosOpen">🚨 <span data-t="sosShort"></span></button>
-  <button id="poopOpen" data-t="poopShort"></button>
   <span class="spacer"></span>
   <span id="date"></span>
 </nav>
@@ -1648,11 +1647,6 @@ $('remind').onchange = e => {
   save(); render();
   // Ask for permission only after the user opts in, never on page load.
   if (me.remind && window.Notification?.permission === 'default') Notification.requestPermission();
-};
-
-$('poopOpen').onclick = () => {
-  $('poopWin').classList.remove('shut');
-  $('poopWin').scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
 $('poopQuickBtn').onclick = () => {
