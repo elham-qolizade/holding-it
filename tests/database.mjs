@@ -64,5 +64,16 @@ try {
   assert.equal(rows.length,4);assert.ok(rows.every(row=>row.relrowsecurity));
  });
  await test('feedback stores optional nickname',async()=>{await q("select public.submit_feedback($1,'bug','test message','tester','fa','web-21')",[uid(1)]);assert.equal(await scalar('select public_name from public.feedback order by id desc limit 1'),'tester');});
+ await test('poop kind is stored and returned by the feed',async()=>{
+  await db.exec('truncate public.events restart identity');
+  const ev=(n,type,kind)=>scalar(kind?'select public.log_event($1,$2,0,null,$3)':'select public.log_event($1,$2,0)',kind?[uid(n),type,kind]:[uid(n),type]);
+  await ev(1,'go','poop');await ev(2,'go');await ev(3,'hold','poop');
+  const feed=(await scalar('select public.pulse()')).feed;
+  const byId=Object.fromEntries(feed.map(e=>[e.id,e]));
+  assert.equal(byId[1].kind,'poop');assert.equal(byId[1].nth,null);
+  assert.equal(byId[2].kind,'pee');assert.equal(byId[2].nth,1);
+  assert.equal(byId[3].kind,'pee');
+  await fails(()=>ev(4,'go','other'),/bad type/);
+ });
  console.log(`\n${passed} database checks passed.`);
 }finally{await db.close();}

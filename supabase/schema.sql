@@ -2,7 +2,7 @@
 -- Safe to run more than once.
 --
 -- Design: the browser never touches the table. It can only call two functions:
---   log_event(session, type, held_mins)  -> records "holding" or "went"
+--   log_event(session, type, held_mins)  -> records "holding" or "went" (kind: pee or poop)
 --   pulse()                              -> live counters + the latest feed lines
 -- The table has row level security on and no policies, so direct reads/writes are refused.
 
@@ -27,6 +27,9 @@ create table if not exists public.events (
 );
 -- Optional nickname the visitor chose (added after launch, so it is a separate statement).
 alter table public.events add column if not exists name text;
+-- What kind of visit a 'go' was. Stored here so every visitor's feed shows the same thing.
+alter table public.events add column if not exists kind text not null default 'pee'
+  check (kind in ('pee', 'poop'));
 create index if not exists events_created_idx on public.events (created_at);
 create index if not exists events_session_idx on public.events (session, created_at desc);
 create index if not exists events_ip_idx      on public.events (ip_hash, created_at);
@@ -36,7 +39,9 @@ revoke all on table public.events from anon, authenticated;
 
 -- The nickname parameter was added later; drop the old 3-argument version so calls are not ambiguous.
 drop function if exists public.log_event(uuid, text, int);
-create or replace function public.log_event(p_session uuid, p_type text, p_held_mins int default 0, p_name text default null)
+drop function if exists public.log_event(uuid, text, int, text);
+create or replace function public.log_event(p_session uuid, p_type text, p_held_mins int default 0, p_name text default null,
+                                            p_kind text default 'pee')
 returns bigint
 language plpgsql
 security definer
@@ -52,9 +57,10 @@ declare
   -- Nickname: no control characters, single spaces, at most 16 characters, empty means none.
   v_name    text := nullif(left(btrim(regexp_replace(regexp_replace(coalesce(p_name, ''), '[[:cntrl:]]', '', 'g'), '\s+', ' ', 'g')), 16), '');
 begin
-  if p_type not in ('hold', 'go') then
+  if p_type not in ('hold', 'go') or p_kind is null or p_kind not in ('pee', 'poop') then
     raise exception 'bad type';
   end if;
+  if p_type = 'hold' then p_kind := 'pee'; end if;   -- only a finished visit can be a poop
   if v_country !~ '^[A-Z]{2}$' or v_country in ('XX', 'T1') then
     v_country := null;
   end if;
@@ -80,13 +86,13 @@ begin
     end if;
   end if;
 
-  if p_type = 'go' then
+  if p_type = 'go' and p_kind = 'pee' then
     select count(*) + 1 into v_nth from public.events
-    where session = p_session and type = 'go' and created_at > now() - interval '18 hours';
+    where session = p_session and type = 'go' and kind = 'pee' and created_at > now() - interval '18 hours';
   end if;
 
-  insert into public.events (session, type, held_mins, nth, country, ip_hash, name)
-  values (p_session, p_type,
+  insert into public.events (session, type, kind, held_mins, nth, country, ip_hash, name)
+  values (p_session, p_type, p_kind,
           case when p_type = 'go' then greatest(0, least(coalesce(p_held_mins, 0), 180)) end,
           v_nth, v_country, v_hash, v_name)
   returning id into v_id;
@@ -119,14 +125,14 @@ as $$
     'today',     (select count(*) from public.events
                   where type = 'go' and created_at > now() - interval '24 hours'),
     'feed',      (select coalesce(json_agg(f), '[]'::json) from (
-                    select id, type, held_mins, nth, country, name from public.events
+                    select id, type, kind, held_mins, nth, country, name from public.events
                     order by id desc limit 8) f)
   );
 $$;
 
-revoke all on function public.log_event(uuid, text, int, text) from public;
+revoke all on function public.log_event(uuid, text, int, text, text) from public;
 revoke all on function public.pulse() from public;
-grant execute on function public.log_event(uuid, text, int, text) to anon, authenticated;
+grant execute on function public.log_event(uuid, text, int, text, text) to anon, authenticated;
 grant execute on function public.pulse() to anon, authenticated;
 
 -- Facts for the "Pee News" window, all from the last 24 hours. Read-only.

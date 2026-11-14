@@ -573,7 +573,7 @@
 <script>
 const $ = id => document.getElementById(id);
 const MIN = 60_000;
-const APP_VERSION = 'web-23';
+const APP_VERSION = 'web-24';
 const NUDGE_AFTER = 180 * MIN;
 const TITLE_AT = [0, 5, 15, 30, 45, 60]; // minutes at which each hold title unlocks
 
@@ -991,11 +991,10 @@ const rpc = (fn, args = {}) =>
     });
 
 // A random id for this browser, and the ids of events it sent (to mark "you" in the feed).
-let session = null, myIds = [], myPoopIds = [];
+let session = null, myIds = [];
 try {
   session = localStorage.getItem('holdingit-session');
   myIds = JSON.parse(localStorage.getItem('holdingit-ids')) ?? [];
-  myPoopIds = JSON.parse(localStorage.getItem('holdingit-poop-ids')) ?? [];
 } catch {}
 if (!session) {
   // randomUUID is missing on older Safari and outside https; build a v4 id from random bytes there.
@@ -1020,7 +1019,7 @@ function renderFeed(feed) {
   currentFeed = merged;
   const lines = merged.map(e => {
     const mine = myIds.includes(e.id);
-    const isPoop = myPoopIds.includes(e.id) || (!mine && (e.id % 4 === 0 || e.held_mins >= 10));
+    const isPoop = e.kind === 'poop';
     const li = document.createElement('li');
     // A line with a name reads "Ali went" for everyone, its owner included (still marked 🫵);
     // "You went" is only for the owner's own lines that have no name.
@@ -1349,13 +1348,10 @@ function addOptimisticFeed(type, heldMins = 0, isPoop = false) {
   lastFeedId = localId;
   myIds = [...myIds, localId].slice(-30);
   try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
-  if (isPoop) {
-    myPoopIds = [...myPoopIds, localId].slice(-30);
-    try { localStorage.setItem('holdingit-poop-ids', JSON.stringify(myPoopIds)); } catch {}
-  }
   const item = {
     id: localId,
     type,
+    kind: isPoop ? 'poop' : 'pee',
     held_mins: heldMins || null,
     nth: type === 'go' && !isPoop ? me.trips.length : null,
     country: null,
@@ -1368,14 +1364,10 @@ function addOptimisticFeed(type, heldMins = 0, isPoop = false) {
 async function publish(type, heldMins = 0, isPoop = false) {
   addOptimisticFeed(type, heldMins, isPoop);
   try {
-    const id = await rpc('log_event', { p_session: session, p_type: type, p_held_mins: heldMins, p_name: me.name || null });
+    const id = await rpc('log_event', { p_session: session, p_type: type, p_held_mins: heldMins, p_name: me.name || null, p_kind: isPoop ? 'poop' : 'pee' });
     if (id) {
       myIds = [...myIds, id].slice(-30);
       try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
-      if (isPoop) {
-        myPoopIds = [...myPoopIds, id].slice(-30);
-        try { localStorage.setItem('holdingit-poop-ids', JSON.stringify(myPoopIds)); } catch {}
-      }
     }
   } catch {} // offline or rate limited: the personal stats above still count on this device
   pulse();

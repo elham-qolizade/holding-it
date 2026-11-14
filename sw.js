@@ -1,5 +1,5 @@
 // Service worker: makes the page installable and usable offline.
-const CACHE = 'holding-it-v24';
+const CACHE = 'holding-it-v25';
 const SHELL = ['./', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', event => {
