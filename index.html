@@ -573,7 +573,7 @@
 <script>
 const $ = id => document.getElementById(id);
 const MIN = 60_000;
-const APP_VERSION = 'web-24';
+const APP_VERSION = 'web-25';
 const NUDGE_AFTER = 180 * MIN;
 const TITLE_AT = [0, 5, 15, 30, 45, 60]; // minutes at which each hold title unlocks
 
@@ -1344,8 +1344,8 @@ async function pulse() {
 }
 
 function addOptimisticFeed(type, heldMins = 0, isPoop = false) {
-  const localId = Math.max(lastFeedId, 1000) + 1;
-  lastFeedId = localId;
+  // Negative ids can never collide with a server id, and leave lastFeedId (the newest server line) alone.
+  const localId = -Date.now();
   myIds = [...myIds, localId].slice(-30);
   try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
   const item = {
@@ -1359,14 +1359,17 @@ function addOptimisticFeed(type, heldMins = 0, isPoop = false) {
   };
   currentFeed = [item, ...currentFeed.filter(e => e.id !== localId)].slice(0, 30);
   renderFeed(currentFeed);
+  return localId;
 }
 
 async function publish(type, heldMins = 0, isPoop = false) {
-  addOptimisticFeed(type, heldMins, isPoop);
+  const localId = addOptimisticFeed(type, heldMins, isPoop);
   try {
     const id = await rpc('log_event', { p_session: session, p_type: type, p_held_mins: heldMins, p_name: me.name || null, p_kind: isPoop ? 'poop' : 'pee' });
     if (id) {
-      myIds = [...myIds, id].slice(-30);
+      // The server line replaces the optimistic one; keeping both showed every own line twice.
+      currentFeed = currentFeed.filter(e => e.id !== localId);
+      myIds = [...myIds.filter(i => i !== localId), id].slice(-30);
       try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
     }
   } catch {} // offline or rate limited: the personal stats above still count on this device
