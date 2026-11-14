@@ -6,8 +6,8 @@
 <title>نگه داشتم — زنده</title>
 <meta name="description" content="ثبت زنده‌ی مأموریت‌های دستشویی، آمار روزانه و پیدا کردن دستشویی نزدیک؛ بدون ثبت‌نام.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="نگه داشتم — دادگاه عالی امور مثانه">
-<meta property="og:description" content="مأموریت امروزت را ثبت کن و حکم رسمی مثانه‌ات را بگیر.">
+<meta property="og:title" content="نگه داشتم — دادگاه عالی امور مثانه و روده">
+<meta property="og:description" content="مأموریت‌های سبک، سنگین و نبردهای یبوست را ثبت کن و حکم رسمی مثانه و روده‌ات را بگیر.">
 <meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#fff8ec">
@@ -263,11 +263,11 @@
   .certificate h3 { margin: 8px 0 2px; font: 800 1.7rem/1.3 var(--title); }
   .case-no { margin: 0 0 18px; font-size: .78rem; }
   .verdict { margin: 0; padding: 12px; border-block: 1px solid var(--ink); font-weight: 700; }
-  .cert-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 16px 0; }
-  .cert-stats > div { padding: 6px 4px; }
+  .cert-stats { display: grid; grid-template-columns: repeat(4, 1fr); margin: 16px 0; }
+  .cert-stats > div { padding: 6px 2px; }
   .cert-stats > div + div { border-inline-start: 1px solid var(--ink); }
-  .cert-stats b { display: block; font: 700 1.35rem/1.2 var(--pixel); }
-  .cert-stats small { display: block; font-size: .72rem; }
+  .cert-stats b { display: block; font: 700 1.2rem/1.2 var(--pixel); }
+  .cert-stats small { display: block; font-size: .65rem; }
   .stamp { width: 126px; height: 126px; margin: 2px auto 12px; display: grid; place-items: center; border: 5px double #ba2636; border-radius: 50%; color: #ba2636; font: 800 1rem/1.15 var(--pixel); opacity: 0; transform: rotate(-13deg); text-transform: uppercase; white-space: pre-line; }
   .stamp.hit { animation: stamp-in .72s cubic-bezier(.18, 1.45, .32, 1) both; }
   @keyframes stamp-in { from { opacity: 0; transform: translateY(-65px) scale(2.2) rotate(-24deg); } 68% { opacity: 1; transform: translateY(5px) scale(.86) rotate(-10deg); } 84% { transform: translateY(-2px) scale(1.06) rotate(-14deg); } to { opacity: 1; transform: translateY(0) scale(1) rotate(-13deg); } }
@@ -290,6 +290,38 @@
   #feedbackName, #feedbackMessage { width: 100%; padding: 9px 10px; color: var(--ink); background: var(--panel); border: 2px solid var(--ink); border-radius: 8px; font: 1rem/1.5 var(--type); }
   #feedbackName { min-height: 44px; } #feedbackMessage { min-height: 110px; resize: vertical; }
   #feedbackStatus { min-height: 1.5em; margin: 8px 0 0; font-weight: 700; }
+  .win.poopwin { --bar: #f4c29c; }
+  #poopQuickBtn { background: #fce1c6; }
+  .poop-status-card { padding: 12px; border: 1px solid var(--ink); border-radius: 8px; background: #fff5eb; }
+  .poop-status-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .poop-status-head b { font-size: 1.05rem; }
+  .poop-quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .poop-details { border-top: 1px dotted var(--ink); padding-top: 10px; }
+  .poop-details > summary { cursor: pointer; font-weight: 700; min-height: 40px; display: flex; align-items: center; }
+  .poop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .poop-type-btn { padding: 10px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--panel); text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 74px; }
+  .poop-type-btn:hover { background: #ffe9d6; }
+  .poop-type-btn .emoji { font-size: 1.4rem; line-height: 1; }
+  .poop-type-btn b { font-size: 0.92rem; }
+  .poop-type-btn small { font-size: 0.76rem; color: var(--muted); }
+  .battle-box { padding: 14px; border: 2px dashed var(--ink); border-radius: 8px; background: #fff8eb; margin-top: 12px; text-align: center; }
+  .battle-timer { font: 700 48px/1 var(--pixel); font-variant-numeric: tabular-nums; margin: 10px 0; color: #a43a12; }
+  .battle-warn { color: #b71c1c; font-weight: 700; margin-top: 8px; font-size: 0.88rem; animation: blink 1.4s infinite; }
+  .battle-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .remedies-box { border-top: 1px dotted var(--ink); padding-top: 14px; margin-top: 14px; }
+  .remedies-header { margin-bottom: 8px; }
+  .remedy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .remedy-tab { min-height: 40px; padding: 6px 8px; border: 1px solid var(--ink); border-radius: 6px; background: var(--panel); font: 700 0.83rem/1.2 var(--type); text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: background .12s ease; }
+  .remedy-tab:hover { background: #ffe9d6; }
+  .remedy-tab.active { background: var(--butter); box-shadow: 2px 2px 0 var(--ink); border-width: 2px; }
+  .remedy-tab.done::before { content: '•'; color: var(--green); font-size: 1.4rem; line-height: 0; }
+  .remedy-inspector { margin-top: 10px; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 8px; background: #fffdf6; box-shadow: 2px 2px 0 var(--ink); font-size: 0.85rem; line-height: 1.5; }
+  .remedy-inspector-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px dotted var(--ink); padding-bottom: 6px; }
+  .remedy-inspector-head b { font-size: 0.95rem; color: #a43a12; }
+  .remedy-inspector-body { display: grid; gap: 6px; }
+  .remedy-inspector-body b { color: #a43a12; }
+  .remedy-toggle-btn { min-height: 32px; padding: 4px 10px; border: 1px solid var(--ink); border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer; background: var(--panel); }
+  .remedy-toggle-btn.checked { background: var(--mint); box-shadow: 1px 1px 0 var(--ink); }
   footer { text-align: center; font-size: 0.84rem; text-transform: uppercase; letter-spacing: .03em; }
 </style>
 </head>
@@ -299,6 +331,7 @@
   <button id="langBtn" data-t="switchTo"></button>
   <button id="installBtn" data-t="install" hidden></button>
   <button id="sosOpen">🚨 <span data-t="sosShort"></span></button>
+  <button id="poopOpen" data-t="poopShort"></button>
   <span class="spacer"></span>
   <span id="date"></span>
 </nav>
@@ -327,6 +360,7 @@
   <section class="buttons">
     <button id="holdBtn" class="btn"><span class="px" data-icon="hourglass"></span><span data-t="hold" id="holdLabel"></span></button>
     <button id="goBtn" class="btn primary"><span class="px" data-icon="toilet"></span><span data-t="go"></span></button>
+    <button id="poopQuickBtn" class="btn"><span class="px" data-icon="poop"></span><span data-t="poopQuick"></span></button>
   </section>
 
   <section class="win" id="nudge" role="status" hidden><div class="body" data-t="nudge"></div></section>
@@ -419,6 +453,78 @@
     </div>
   </section>
 
+  <section class="win poopwin shut" id="poopWin">
+    <h2><button class="box"></button><span data-t="poopTitle"></span></h2>
+    <div class="body">
+      <div class="poop-status-card">
+        <div class="poop-status-head">
+          <span id="poopStatusBadge" class="badge good"></span>
+          <b id="poopDaysText"></b>
+        </div>
+        <p class="muted" id="poopLastText" style="margin: 6px 0 10px;"></p>
+        <div class="poop-quick-actions">
+          <button id="poopStuckBtn" class="btn small" type="button" data-t="poopStuckAction"></button>
+          <button id="poopOpenLogBtn" class="btn small primary" type="button" data-t="poopLogAction"></button>
+        </div>
+      </div>
+
+      <details id="poopLogDetails" class="poop-details" style="margin: 12px 0;">
+        <summary data-t="poopLogDetailsTitle"></summary>
+        <p class="muted" data-t="poopBristolHelp" style="margin: 6px 0;"></p>
+        <div class="poop-grid">
+          <button type="button" class="poop-type-btn" data-result="smooth"><b data-t="poopSmoothTitle"></b><small data-t="poopSmoothDesc"></small></button>
+          <button type="button" class="poop-type-btn" data-result="struggle"><b data-t="poopStruggleTitle"></b><small data-t="poopStruggleDesc"></small></button>
+          <button type="button" class="poop-type-btn" data-result="liquid"><b data-t="poopLiquidTitle"></b><small data-t="poopLiquidDesc"></small></button>
+          <button type="button" class="poop-type-btn" data-result="failed"><b data-t="poopFailedTitle"></b><small data-t="poopFailedDesc"></small></button>
+        </div>
+      </details>
+
+      <div class="battle-box" id="battleBox">
+        <div class="battle-head"><b data-t="poopBattleHeading"></b></div>
+        <p class="muted" style="margin: 4px 0 8px;" data-t="poopBattleSub"></p>
+        <div id="battleTimerWrap" hidden>
+          <div class="battle-timer" id="battleTimer" dir="ltr">00:00</div>
+          <p class="muted" id="battleTip" data-t="poopBattleTip"></p>
+          <p class="battle-warn" id="battleWarn" hidden data-t="poopBattleWarn"></p>
+          <div class="battle-controls">
+            <button id="battleEndBtn" class="btn small primary" type="button" data-t="poopBattleEnd"></button>
+            <button id="battleRetreatBtn" class="btn small" type="button" data-t="poopBattleGiveUp"></button>
+          </div>
+        </div>
+        <button id="battleStartBtn" class="btn small" type="button" data-t="poopBattleStart"></button>
+      </div>
+
+      <div class="remedies-box">
+        <div class="remedies-header">
+          <b data-t="poopRemediesTitle" style="font-size: 0.98rem;"></b>
+          <p class="muted" style="margin: 3px 0 8px; font-size: 0.82rem;" data-t="poopRemediesSub"></p>
+        </div>
+
+        <div class="remedy-grid">
+          <button type="button" class="remedy-tab active" data-remedy="water" data-t="remWaterTitle"></button>
+          <button type="button" class="remedy-tab" data-remedy="olive" data-t="remOliveTitle"></button>
+          <button type="button" class="remedy-tab" data-remedy="flixweed" data-t="remFlixweedTitle"></button>
+          <button type="button" class="remedy-tab" data-remedy="figs" data-t="remFigsTitle"></button>
+          <button type="button" class="remedy-tab" data-remedy="squat" data-t="remSquatTitle"></button>
+          <button type="button" class="remedy-tab" data-remedy="kiwi" data-t="remKiwiTitle"></button>
+          <button type="button" class="remedy-tab" data-remedy="walk" data-t="remWalkTitle"></button>
+          <button type="button" class="remedy-tab" data-remedy="coffee" data-t="remCoffeeTitle"></button>
+        </div>
+
+        <div class="remedy-inspector" id="remedyInspector">
+          <div class="remedy-inspector-head">
+            <b id="inspectorTitle"></b>
+            <button type="button" id="inspectorActionBtn" class="remedy-toggle-btn"></button>
+          </div>
+          <div class="remedy-inspector-body">
+            <div><b data-t="remedyBenefit"></b> <span id="inspectorBenefit"></span></div>
+            <div><b data-t="remedyHow"></b> <span id="inspectorHow"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="win feedwin">
     <h2><button class="box"></button><span data-t="feedTitle"></span></h2>
     <ul class="feed" id="feed"></ul>
@@ -451,6 +557,7 @@
       <p class="verdict" id="certVerdict"></p>
       <div class="cert-stats">
         <div><b id="certTrips">0</b><small data-t="certTripsLabel"></small></div>
+        <div><b id="certPoop">0</b><small data-t="certPoopLabel"></small></div>
         <div><b id="certHold">–</b><small data-t="certHoldLabel"></small></div>
         <div><b id="certWater">0</b><small data-t="certWaterLabel"></small></div>
       </div>
@@ -475,7 +582,7 @@ const TITLE_AT = [0, 5, 15, 30, 45, 60]; // minutes at which each hold title unl
 const T = {
   en: {
     dir: 'ltr', docTitle: 'Holding It — live', switchTo: 'فارسی',
-    h1a: 'Holding', h1b: 'It', tag: 'The whole world needs to pee. Live.',
+    h1a: 'Holding', h1b: 'It', tag: 'The whole world needs to pee (or fight constipation). Live.',
     inToilet: 'in the bathroom right now', holding: 'holding it right now',
     total: 'bathroom trips today, worldwide',
     nudge: '3 hours. Your bladder would like a word. 🚨',
@@ -486,16 +593,82 @@ const T = {
     waterProgress: 'Water progress', waterUndo: 'Undo', waterOne: '+ 1 glass', waterTwo: '+ 2 glasses',
     waterToast: n => `${n} glass${n === '1' ? '' : 'es'} joined the bladder queue 😅`, waterEmpty: 'The water department has no reports yet.',
     waterLast: (n, time) => `${n} water stop${n === '1' ? '' : 's'} · last at ${time}`, waterDone: 'Goal reached. Your bladder has been notified. 🚨',
+    poopShort: 'Bowel & Poop',
+    poopQuick: 'Bowel Mission',
+    poopTitle: 'Bowel Affairs & Constipation Bureau',
+    poopStatusClean: 'Relieved & Clear 🟢',
+    poopStatus1: '1-day pause',
+    poopStatus2: '2 days blocked',
+    poopStatus3: 'Code Red: 3+ days constipated',
+    poopDays: n => `${n} days without #2`,
+    poopLast: time => `Last mission: ${time}`,
+    poopNever: 'No bowel missions logged yet.',
+    poopStuckAction: 'Blocked today (+1 day)',
+    poopLogAction: 'Log bowel mission',
+    poopLogDetailsTitle: 'Mission Report (Bristol Scale)',
+    poopBristolHelp: 'How did the bowel mission go?',
+    poopSmoothTitle: 'Smooth & Easy',
+    poopSmoothDesc: 'Falcon glide',
+    poopStruggleTitle: 'Heavy Battle',
+    poopStruggleDesc: 'Guerrilla effort',
+    poopLiquidTitle: 'Liquid Emergency',
+    poopLiquidDesc: 'Red alert',
+    poopFailedTitle: 'Mission Failed',
+    poopFailedDesc: 'Empty hands',
+    poopBattleHeading: 'Trench Battle Timer',
+    poopBattleSub: 'Sitting for #2? Start the clock to avoid sitting too long.',
+    poopBattleStart: 'Enter Trench (Start Battle)',
+    poopBattleEnd: 'Victorious Exit (Relieved)',
+    poopBattleGiveUp: 'Tactical Retreat (Failed)',
+    poopBattleTip: 'Tactical tip: Put a footstool under your feet for a 35° squat angle',
+    poopBattleWarn: 'Warning: Over 10 mins sitting! High vascular pressure. Stand up, drink warm water, try later.',
+    poopRemediesTitle: 'Tactical Constipation Manual & Toolkit',
+    poopRemediesSub: 'Click any tactic to view scientific benefits and usage; log when taken:',
+    remedyDone: 'Done',
+    remedyNotDone: 'Log this',
+    remedyBenefit: 'Scientific benefit:',
+    remedyHow: 'How to use:',
+    remWaterTitle: 'Warm Water on Waking',
+    remWaterBenefit: 'Triggers the gastrocolic reflex and stimulates colonic contractions right after sleep.',
+    remWaterHow: 'Drink two cups of lukewarm water immediately after getting out of bed, before breakfast.',
+    remOliveTitle: 'Olive Oil',
+    remOliveBenefit: 'Lubricates the colonic mucosal lining and promotes bile flow to ease stool passage.',
+    remOliveHow: 'Take 1 to 2 tablespoons in the morning on an empty stomach (optional: with fresh lemon drops).',
+    remFlixweedTitle: 'Flixweed with Hot Water',
+    remFlixweedBenefit: 'Releases natural mucilage, binds stool moisture, and relieves stubborn dry colon passages.',
+    remFlixweedHow: 'Steep two tablespoons of cleaned flixweed seeds in hot water for 5 minutes; drink warm.',
+    remFigsTitle: 'Soaked Figs & Prunes',
+    remFigsBenefit: 'Packed with natural sorbitol and osmotic soluble fiber that pulls water into the intestinal lumen.',
+    remFigsHow: 'Soak 4 to 5 figs or dried prunes in warm water overnight; eat the fruit and drink the syrup in the morning.',
+    remSquatTitle: 'Footstool (35-Degree Squat Angle)',
+    remSquatBenefit: 'Relaxes the puborectalis muscle and unkinks the rectum, replicating natural squatting mechanics.',
+    remSquatHow: 'Place a 15–20 cm stool under both feet on a seated toilet and lean your torso slightly forward.',
+    remKiwiTitle: 'Kiwi & Soluble Seed Fiber',
+    remKiwiBenefit: 'Natural actinidin enzyme and dense fiber bulk up the stool and accelerate transit time.',
+    remKiwiHow: 'Eat two ripe kiwis daily, or drink a spoonful of soaked chia or psyllium seeds with plenty of water.',
+    remWalkTitle: 'Brisk Walk & Abdominal Massage',
+    remWalkBenefit: 'Physical movement and gravity stimulate peristalsis to move sluggish cargo downward.',
+    remWalkHow: 'Take a 10–15 minute walk, then perform gentle circular clockwise belly massage following colonic flow.',
+    remCoffeeTitle: 'Hot Coffee or Tea',
+    remCoffeeBenefit: 'Heat and caffeine trigger gastrin release and stimulate motor activity in the distal colon.',
+    remCoffeeHow: 'Enjoy one cup in early morning hours, accompanied by water to stay hydrated.',
+    remedyToast: r => `${r} deployed to the front line!`,
+    poopToastSuccess: 'Bowel mission filed in the archives.',
+    poopToastStuck: 'Blockage recorded. Immediate warm water and fiber mandated.',
+    poopToastFailed: 'Tactical retreat documented. Drink water and try later.',
     share: 'Share my day', copied: 'Copied!', feedTitle: 'Live feed',
-    certCourt: 'Supreme Court of Bladder Affairs', certTitle: 'Official Daily Certificate',
+    certCourt: 'Supreme Court of Bladder & Bowel Affairs', certTitle: 'Official Daily Certificate',
     certCase: n => `Case no. ${n}`,
     certVerdictNone: 'No bathroom mission has been logged today. The court finds the evidence insufficient.',
     certVerdictHolding: n => `The defendant has been holding it for ${n}. Immediate action is strongly advised.`,
     certVerdictLong: n => `A resistance of ${n} was recorded. The court considers this behavior unnecessarily heroic.`,
     certVerdictBusy: n => `${n} bathroom missions were recorded today. Traffic is suspicious, but still legal.`,
     certVerdictRelieved: n => `The court confirms ${n} successful bathroom mission${n === '1' ? '' : 's'} today.`,
-    certTripsLabel: 'missions', certHoldLabel: 'longest hold', certWaterLabel: 'glasses',
-    certStamp: 'Officially\nRelieved', certStampNone: 'Insufficient\nEvidence', certStampHolding: 'Critical\nCase', certStampLong: 'Illegal\nResistance', certStampBusy: 'Suspicious\nTraffic', certShare: 'Share certificate image', certClose: '×', certCloseLabel: 'Close certificate',
+    certVerdictConstipated: n => `The defendant has withheld cargo for ${n} days; the court orders immediate olive oil intervention.`,
+    certVerdictBowelBattle: 'A fierce trench battle was documented; defendant showed valor but urgently needs dietary fiber.',
+    certVerdictBowelSmooth: 'Victorious, friction-free bowel release confirmed; the court commends this diet.',
+    certTripsLabel: 'missions', certPoopLabel: 'bowel #2', certHoldLabel: 'longest hold', certWaterLabel: 'glasses',
+    certStamp: 'Officially\nRelieved', certStampNone: 'Insufficient\nEvidence', certStampHolding: 'Critical\nCase', certStampLong: 'Illegal\nResistance', certStampBusy: 'Suspicious\nTraffic', certStampConstipated: 'Blocked\nPassage', certStampBowelBattle: 'Heavy\nBattle', certStampBowelSmooth: 'Smooth\nVictory', certShare: 'Share certificate image', certClose: '×', certCloseLabel: 'Close certificate',
     certPreparing: 'Preparing the evidence…', certCopied: 'The verdict was delivered.', certDownloaded: 'Certificate downloaded. Attach it to your post!', certShareFail: 'Sharing was blocked. Try again.',
     certFooter: 'HOLDING IT · Get your own bladder verdict',
     liveTitle: 'Right now', timerTitle: 'Resisting',
@@ -543,6 +716,8 @@ const T = {
       'Analysis: the person who left mid-movie missed the best scene.',
       'Special report: the sound of running water named enemy number one of the resistance.',
       'Markets: toilet paper shares jump after breakfast.',
+      'Bowel Authority: Taking a smartphone into the restroom violates tactical evacuation rules.',
+      'Field report: A small footstool under the feet changed the entire balance of power in the trench.',
     ],
     nameLabel: 'Name', namePh: 'optional: your name or a nickname', someone: 'Someone',
     install: 'Install app', holdingNow: 'Holding…', collapse: 'Collapse window',
@@ -559,16 +734,18 @@ const T = {
              'Level: Living Legend 👑', "Okay, that's enough. Go! 🚨"],
     others: n => `You and ${n} others are resisting right now`,
     mins: m => `${m}m`, hours: (h, m) => `${h}h ${m}m`,
-    fHold: mine => `${mine ? 'You' : 'Someone'} started holding it ⏳`,
-    fNth: (mine, n) => `${mine ? 'You' : 'Someone'} went for the ${n} time today 🏆`,
-    fAfter: (mine, n) => `${mine ? 'You' : 'Someone'} finally went after ${n} minutes 😅`,
-    fGo: mine => `${mine ? 'You' : 'Someone'} just went 🚽`,
+    fHold: mine => mine ? 'You are holding your pee and resisting ⏳' : 'Someone is holding their pee and resisting ⏳',
+    fNth: (mine, n) => `${mine ? 'You' : 'Someone'} went to pee for the ${n} time today 🏆`,
+    fAfter: (mine, n) => `${mine ? 'You' : 'Someone'} finally went to pee after ${n} minutes 😅`,
+    fGo: mine => `${mine ? 'You' : 'Someone'} went to pee 🚽`,
+    fPoop: mine => `${mine ? 'You' : 'Someone'} went to poop 🚽`,
+    fAfterPoop: (mine, n) => `${mine ? 'You' : 'Someone'} finally went to poop after ${n} minutes of battle 😅`,
     shareText: (n, best) => `The Supreme Court of Bladder Affairs confirms: I went ${n} time${n === '1' ? '' : 's'} today`
       + (best ? ` and held it for ${best}` : '') + '. Get your own verdict 🚽',
   },
   fa: {
     dir: 'rtl', docTitle: 'نگه داشتم — زنده', switchTo: 'English',
-    h1a: 'نگه', h1b: 'داشتم', tag: 'کل دنیا جیش داره. زنده.',
+    h1a: 'نگه', h1b: 'داشتم', tag: 'کل دنیا جیش (و گاهی یبوست) داره. زنده.',
     inToilet: 'نفر الان توی دستشویی‌ان', holding: 'نفر الان نگه داشتن',
     total: 'بار دستشویی امروز، در کل دنیا',
     nudge: '۳ ساعت شد. مثانه‌ات باهات حرف داره. 🚨',
@@ -579,16 +756,82 @@ const T = {
     waterProgress: 'پیشرفت آب امروز', waterUndo: 'برگشت', waterOne: '‎+۱ لیوان', waterTwo: '‎+۲ لیوان',
     waterToast: n => `${n} لیوان رفت توی صف مثانه 😅`, waterEmpty: 'اداره‌ی آب هنوز گزارشی نداده.',
     waterLast: (n, time) => `${n} نوبت آب خوردی · آخری ساعت ${time}`, waterDone: 'هدف پر شد؛ مثانه در جریان قرار گرفت! 🚨',
+    poopShort: 'یبوست و روده',
+    poopQuick: 'مأموریت سنگین',
+    poopTitle: 'دیوان امور روده و ستاد مقابله با یبوست',
+    poopStatusClean: 'تخلیه موفق و روان 🟢',
+    poopStatus1: '۱ روز وقفه',
+    poopStatus2: '۲ روز انسداد معابر',
+    poopStatus3: 'کد قرمز: ۳+ روز یبوست حاد',
+    poopDays: n => `${n} روز بدون دفع سنگین`,
+    poopLast: time => `آخرین مأموریت سنگین: ${time}`,
+    poopNever: 'هنوز مأموریت سنگینی ثبت نشده.',
+    poopStuckAction: 'امروز هم نشد (+۱ روز انسداد)',
+    poopLogAction: 'ثبت تخلیه سنگین',
+    poopLogDetailsTitle: 'گزارش مشخصات مأموریت (مقیاس بریستول)',
+    poopBristolHelp: 'کیفیت و شرایط تخلیه چطور بود؟',
+    poopSmoothTitle: 'روان و بی‌دردسر',
+    poopSmoothDesc: 'پرواز شاهین',
+    poopStruggleTitle: 'نبرد سنگین',
+    poopStruggleDesc: 'تلاش چریکی',
+    poopLiquidTitle: 'سیلاب اضطراری',
+    poopLiquidDesc: 'سیستم هشدار',
+    poopFailedTitle: 'شکست عملیات',
+    poopFailedDesc: 'نشستیم و نشد',
+    poopBattleHeading: 'تایمر نبرد در سنگر (دستشویی)',
+    poopBattleSub: 'برای مأموریت سنگین نشستی؟ تایمر بزن تا از نشستن طولانی جلوگیری کنی.',
+    poopBattleStart: 'ورود به سنگر (شروع تایمر)',
+    poopBattleEnd: 'خروج پیروزمندانه از سنگر',
+    poopBattleGiveUp: 'عقب‌نشینی تاکتیکی (شکست)',
+    poopBattleTip: 'نکته تاکتیکی: یک چهارپایه زیر پاهایت بگذار تا زاویه رکتوم ۳۵ درجه شود',
+    poopBattleWarn: 'هشدار: بیش از ۱۰ دقیقه نشستی! فشار روی عروق بالاست. بلند شو، آب گرم بخور و بعداً برگرد.',
+    poopRemediesTitle: 'دفترچه راهنما و جعبه‌ابزار رفع یبوست',
+    poopRemediesSub: 'روی هر روش کلیک کنید تا فایده علمی و دستور مصرف را بخوانید؛ پس از انجام دکمه ثبت را بزنید:',
+    remedyDone: 'مصرف شد',
+    remedyNotDone: 'ثبت مصرف',
+    remedyBenefit: 'فایده علمی:',
+    remedyHow: 'دستور مصرف:',
+    remWaterTitle: 'آب گرم ناشتا',
+    remWaterBenefit: 'تحریک رفلکس معده-روده (Gastrocolic) و فعال‌سازی حرکات دودی کولون پس از خواب.',
+    remWaterHow: 'دو لیوان آب ولرم بلافاصله پس از بیدار شدن و پیش از صبحانه بنوشید.',
+    remOliveTitle: 'روغن زیتون',
+    remOliveBenefit: 'روان‌سازی دیواره روده و تحریک ترشح صفرا جهت تسهیل خروج بار بدون اصطکاک.',
+    remOliveHow: 'یک تا دو قاشق غذاخوری صبح ناشتا (اختیاری: همراه با چند قطره آبلیموی تازه).',
+    remFlixweedTitle: 'خاکشیر با آب جوش',
+    remFlixweedBenefit: 'لعاب‌اندازی طبیعی، افزایش جذب آب به بافت و رفع خشکی مزمن دیواره کولون.',
+    remFlixweedHow: 'دو قاشق خاکشیر تمیز را در یک لیوان آب جوش به مدت ۵ دقیقه دم کرده و ولرم بنوشید.',
+    remFigsTitle: 'انجیر و آلوی خیسانده',
+    remFigsBenefit: 'حاوی سوربیتول طبیعی و فیبر اسموتیک که آب را به درون مجرا می‌کشد و بافت را نرم می‌کند.',
+    remFigsHow: 'چهار تا پنج عدد انجیر یا آلو را شب در آب بخیسانید؛ صبح میوه‌ها و شربت غلیظ آن را میل کنید.',
+    remSquatTitle: 'چهارپایه زیر پا (زاویه ۳۵ درجه)',
+    remSquatBenefit: 'آزادسازی عضله پوبورکتالیس و باز شدن پیچ رکتوم؛ شبیه‌سازی ارگونومی توالت ایرانی روی فرنگی.',
+    remSquatHow: 'هنگام نشستن یک چهارپایه ۱۵ تا ۲۰ سانتی‌متری زیر پاها بگذارید و بالاتنه را کمی به جلو متمایل کنید.',
+    remKiwiTitle: 'کیوی و فیبرهای لعاب‌دار',
+    remKiwiBenefit: 'آنزیم اکتینیدین و فیبر غنی کیوی حجم مدفوع را افزایش داده و سرعت خروج را بالا می‌برند.',
+    remKiwiHow: 'روزانه دو عدد کیوی رسیده میل کنید؛ یا یک قاشق چیا/بارهنگ خیس‌خورده را با آب بنوشید.',
+    remWalkTitle: 'پیاده‌روی و ماساژ شکمی',
+    remWalkBenefit: 'انقباض عضلات شکم و تحریک مکانیکی روده توسط جاذبه برای هدایت محتویات به سمت خروجی.',
+    remWalkHow: '۱۰ تا ۱۵ دقیقه پیاده‌روی تند، سپس ماساژ دورانی ملایم شکم در جهت عقربه‌های ساعت.',
+    remCoffeeTitle: 'قهوه یا چای داغ',
+    remCoffeeBenefit: 'مایع گرم و کافئین ترشح هورمون گاسترین و انقباضات انتهای روده بزرگ را به سرعت فعال می‌کنند.',
+    remCoffeeHow: 'یک فنجان در ساعات اولیه صبح مصرف شود؛ همراه با آب کافی تا مانع از کم‌آبی بدن شود.',
+    remedyToast: r => `${r} به خط مقدم گوارش اعزام شد.`,
+    poopToastSuccess: 'مأموریت سنگین با موفقیت در بایگانی روده ثبت شد.',
+    poopToastStuck: 'گزارش انسداد ثبت شد؛ مصرف فوری آب گرم و روغن زیتون ابلاغ گردید.',
+    poopToastFailed: 'عقب‌نشینی تاکتیکی ثبت شد. آب گرم بنوش و بعداً تلاش کن.',
     share: 'امروزم رو به اشتراک بذار', copied: 'کپی شد!', feedTitle: 'فید زنده',
-    certCourt: 'دادگاه عالی رسیدگی به امور مثانه', certTitle: 'گواهی رسمی عملکرد روزانه',
+    certCourt: 'دادگاه عالی رسیدگی به امور مثانه و روده', certTitle: 'گواهی رسمی عملکرد روزانه',
     certCase: n => `شماره پرونده: ${n}`,
     certVerdictNone: 'امروز هیچ مأموریت دستشویی ثبت نشده است؛ دادگاه مدارک را برای صدور حکم کافی نمی‌داند.',
     certVerdictHolding: n => `متهم ${n} است که نگه داشته؛ دادگاه اقدام فوری را قویاً توصیه می‌کند.`,
     certVerdictLong: n => `مقاومت ${n} ثبت شد؛ دادگاه این میزان قهرمان‌بازی را غیرضروری تشخیص داد.`,
     certVerdictBusy: n => `امروز ${n} مأموریت ثبت شد؛ تردد مشکوک ولی همچنان قانونی است.`,
     certVerdictRelieved: n => `دادگاه وقوع ${n} مأموریت موفق دستشویی را در امروز تأیید می‌کند.`,
-    certTripsLabel: 'مأموریت', certHoldLabel: 'بیشترین مقاومت', certWaterLabel: 'لیوان آب',
-    certStamp: 'رسماً\nتخلیه شد', certStampNone: 'مدرک\nکافی نیست', certStampHolding: 'پرونده\nبحرانی', certStampLong: 'مقاومت\nغیرمجاز', certStampBusy: 'تردد\nمشکوک', certShare: 'اشتراک تصویر حکم', certClose: '×', certCloseLabel: 'بستن گواهی',
+    certVerdictConstipated: n => `متهم ${n} روز است که از ترخیص محموله خودداری نموده؛ دیوان دستور مداخله فوری با روغن زیتون و خاکشیر صادر کرد.`,
+    certVerdictBowelBattle: 'نبرد سنگین در سنگر مستند شد؛ شجاعت متهم ستودنی است ولی رژیم غذایی نیازمند فیبر فوری است.',
+    certVerdictBowelSmooth: 'تخلیه پیروزمندانه و بدون اصطکاک در روده به ثبت رسید؛ دیوان از عملکرد رژیم غذایی ابراز رضایت دارد.',
+    certTripsLabel: 'مأموریت سبک', certPoopLabel: 'مأموریت سنگین', certHoldLabel: 'بیشترین مقاومت', certWaterLabel: 'لیوان آب',
+    certStamp: 'رسماً\nتخلیه شد', certStampNone: 'مدرک\nکافی نیست', certStampHolding: 'پرونده\nبحرانی', certStampLong: 'مقاومت\nغیرمجاز', certStampBusy: 'تردد\nمشکوک', certStampConstipated: 'انسداد\nمعابر', certStampBowelBattle: 'نبرد\nسنگین', certStampBowelSmooth: 'تخلیه\nپیروزمندانه', certShare: 'اشتراک تصویر حکم', certClose: '×', certCloseLabel: 'بستن گواهی',
     certPreparing: 'در حال آماده‌کردن مدرک…', certCopied: 'حکم دادگاه ابلاغ شد.', certDownloaded: 'تصویر حکم دانلود شد؛ بچسبانش به پست!', certShareFail: 'ابلاغ نشد؛ دوباره امتحان کن.',
     certFooter: 'نگه داشتم · تو هم حکم مثانه‌ات را بگیر',
     liveTitle: 'همین الان', timerTitle: 'در حال مقاومت',
@@ -636,6 +879,8 @@ const T = {
       'تحلیل: آن کسی که وسط فیلم رفت، بهترین صحنه را از دست داد.',
       'گزارش ویژه: صدای آب، دشمن شماره‌ی یک مقاومت شناخته شد.',
       'اقتصاد: سهام دستمال توالت پس از صبحانه جهش کرد.',
+      'سازمان گوارش: بردن گوشی موبایل به دستشویی نقض صریح پروتکل‌های تخلیه سریع است.',
+      'گزارش میدانی: یک چهارپایه کوچک زیر پا، موازنه قدرت را در سنگر به نفع روده تغییر داد.',
     ],
     nameLabel: 'اسم', namePh: 'اختیاری؛ اسم یا لقبت', someone: 'یک نفر',
     install: 'نصب اپ', holdingNow: 'در حال نگه داشتن…', collapse: 'جمع کردن پنجره',
@@ -652,10 +897,12 @@ const T = {
              'سطح: اسطوره‌ی زنده 👑', 'بسه دیگه، برو! 🚨'],
     others: n => `تو و ${n} نفر دیگه الان در حال مقاومتید`,
     mins: m => `${m} دق`, hours: (h, m) => `${h} س ${m} دق`,
-    fHold: mine => mine ? 'تو شروع کردی به نگه داشتن ⏳' : 'یک نفر شروع کرد به نگه داشتن ⏳',
-    fNth: (mine, n) => mine ? `تو امروز برای بار ${n}ام رفتی 🏆` : `یک نفر امروز برای بار ${n}ام رفت 🏆`,
-    fAfter: (mine, n) => mine ? `تو بعد از ${n} دقیقه بالاخره رفتی 😅` : `یک نفر بعد از ${n} دقیقه بالاخره رفت 😅`,
-    fGo: mine => mine ? 'تو همین الان رفتی 🚽' : 'یک نفر همین الان رفت 🚽',
+    fHold: mine => mine ? 'تو جیشتو نگه داشتی و درحال مقاومتی ⏳' : 'یک نفر جیششو نگه داشته و درحال مقاومته ⏳',
+    fNth: (mine, n) => mine ? `تو امروز برای بار ${n}ام رفتی جیش 🏆` : `یک نفر امروز برای بار ${n}ام رفت جیش 🏆`,
+    fAfter: (mine, n) => mine ? `تو بعد از ${n} دقیقه مقاومت بالاخره رفتی جیش 😅` : `یک نفر بعد از ${n} دقیقه مقاومت بالاخره رفت جیش 😅`,
+    fGo: mine => mine ? 'تو رفتی جیش 🚽' : 'یک نفر رفت جیش 🚽',
+    fPoop: mine => mine ? 'تو رفتی برینی 🚽' : 'یک نفر رفت برینه 🚽',
+    fAfterPoop: (mine, n) => mine ? `تو بعد از ${n} دقیقه نبرد بالاخره رفتی برینی 😅` : `یک نفر بعد از ${n} دقیقه نبرد بالاخره رفت برینه 😅`,
     shareText: (n, best) => `دادگاه عالی امور مثانه تأیید می‌کند: امروز ${n} بار رفتم دستشویی`
       + (best ? ` و ${best} نگه داشتم` : '') + '. تو هم حکمت را بگیر 🚽',
   },
@@ -679,6 +926,8 @@ const ICONS = {
               '...#.#...', '..#...#..', '.#..#..#.', '.#.###.#.', '#########'],
   toilet: ['.####......', '.#..#......', '.#..#......', '.#..#......', '.#..#######', '.#........#',
            '.##......##', '..########.', '...#....#..', '...#....#..', '..########.'],
+  poop: ['....#......', '...###.....', '..#####....', '..#...#....', '.#######...',
+         '#########..', '.#.......#.', '###########', '###########', '.#########.', '...........'],
 };
 const pixelIcon = rows => `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">`
   + rows.flatMap((row, y) => [...row].map((c, x) => c === '#' ? `<rect x="${x}" y="${y}" width="1" height="1"/>` : '')).join('')
@@ -714,9 +963,16 @@ console.assert(Object.keys(T.en).join() === Object.keys(T.fa).join(), 'languages
 // ---- personal state (this browser only) ----
 let me = { day: null, trips: [], bestHold: 0, holdingSince: null };
 try { me = JSON.parse(localStorage.getItem('holdingit')) ?? me; } catch {}
+if (!Array.isArray(me.trips)) me.trips = [];
+if (typeof me.bestHold !== 'number') me.bestHold = 0;
 // Migrate the first, count-only water tracker to timestamped millilitre entries.
 if (!Array.isArray(me.waterLog)) me.waterLog = Array.from({ length: me.water ?? 0 }, () => ({ ml: 250, at: Date.now() }));
 me.waterGoal = [1500, 2000, 2500, 3000].includes(me.waterGoal) ? me.waterGoal : 2000;
+if (!Array.isArray(me.poopLog)) me.poopLog = [];
+if (!Array.isArray(me.remedies)) me.remedies = [];
+if (typeof me.lastPoopAt !== 'number') me.lastPoopAt = null;
+if (typeof me.constipationDays !== 'number') me.constipationDays = 0;
+if (typeof me.battleStart !== 'number') me.battleStart = null;
 // Keep an active personal timer across reloads and day changes until the user logs a trip.
 // Reject malformed saved timestamps without expiring valid long-running timers.
 if (!Number.isFinite(me.holdingSince) || me.holdingSince <= 0 || me.holdingSince > Date.now()) me.holdingSince = null;
@@ -736,10 +992,11 @@ const rpc = (fn, args = {}) =>
     });
 
 // A random id for this browser, and the ids of events it sent (to mark "you" in the feed).
-let session = null, myIds = [];
+let session = null, myIds = [], myPoopIds = [];
 try {
   session = localStorage.getItem('holdingit-session');
   myIds = JSON.parse(localStorage.getItem('holdingit-ids')) ?? [];
+  myPoopIds = JSON.parse(localStorage.getItem('holdingit-poop-ids')) ?? [];
 } catch {}
 if (!session) {
   // randomUUID is missing on older Safari and outside https; build a v4 id from random bytes there.
@@ -756,15 +1013,22 @@ const ordinal = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 - 20) % 10] || ['th'
 console.assert([1, 2, 3, 4, 11, 12, 13, 21, 22, 101, 111].map(ordinal).join() === '1st,2nd,3rd,4th,11th,12th,13th,21st,22nd,101st,111th', 'ordinal');
 console.assert(flagOf('DE') === '🇩🇪' && flagOf(null) === '🌍', 'flagOf');
 
+let currentFeed = [];
 function renderFeed(feed) {
-  const lines = feed.map(e => {
+  const serverIds = new Set(feed.map(e => e.id));
+  const recentLocal = currentFeed.filter(e => myIds.includes(e.id) && !serverIds.has(e.id));
+  const merged = [...recentLocal, ...feed].slice(0, 30);
+  currentFeed = merged;
+  const lines = merged.map(e => {
     const mine = myIds.includes(e.id);
+    const isPoop = myPoopIds.includes(e.id) || (!mine && (e.id % 4 === 0 || e.held_mins >= 10));
     const li = document.createElement('li');
     // A line with a name reads "Ali went" for everyone, its owner included (still marked 🫵);
     // "You went" is only for the owner's own lines that have no name.
     const you = mine && !e.name;
     const content = document.createElement('span');
     const text = e.type === 'hold' ? t.fHold(you)
+      : isPoop ? (e.held_mins ? t.fAfterPoop(you, num(e.held_mins)) : t.fPoop(you))
       : e.nth >= 5 ? t.fNth(you, lang === 'en' ? ordinal(e.nth) : num(e.nth))
       : e.held_mins ? t.fAfter(you, num(e.held_mins))
       : t.fGo(you);
@@ -793,7 +1057,7 @@ function renderFeed(feed) {
     lines.push(li);
   }
   $('feed').replaceChildren(...lines);
-  lastFeedId = Math.max(lastFeedId, ...feed.map(e => e.id));
+  lastFeedId = Math.max(lastFeedId, ...merged.map(e => e.id));
 }
 
 // ---- Pee News: headlines built from real numbers, padded with a few canned jokes ----
@@ -1081,11 +1345,39 @@ async function pulse() {
   } catch {} // offline: keep showing the last known numbers
 }
 
-async function publish(type, heldMins = 0) {
+function addOptimisticFeed(type, heldMins = 0, isPoop = false) {
+  const localId = Math.max(lastFeedId, 1000) + 1;
+  lastFeedId = localId;
+  myIds = [...myIds, localId].slice(-30);
+  try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
+  if (isPoop) {
+    myPoopIds = [...myPoopIds, localId].slice(-30);
+    try { localStorage.setItem('holdingit-poop-ids', JSON.stringify(myPoopIds)); } catch {}
+  }
+  const item = {
+    id: localId,
+    type,
+    held_mins: heldMins || null,
+    nth: type === 'go' && !isPoop ? me.trips.length : null,
+    country: null,
+    name: me.name || null
+  };
+  currentFeed = [item, ...currentFeed.filter(e => e.id !== localId)].slice(0, 30);
+  renderFeed(currentFeed);
+}
+
+async function publish(type, heldMins = 0, isPoop = false) {
+  addOptimisticFeed(type, heldMins, isPoop);
   try {
     const id = await rpc('log_event', { p_session: session, p_type: type, p_held_mins: heldMins, p_name: me.name || null });
-    myIds = [...myIds, id].slice(-30);
-    try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
+    if (id) {
+      myIds = [...myIds, id].slice(-30);
+      try { localStorage.setItem('holdingit-ids', JSON.stringify(myIds)); } catch {}
+      if (isPoop) {
+        myPoopIds = [...myPoopIds, id].slice(-30);
+        try { localStorage.setItem('holdingit-poop-ids', JSON.stringify(myPoopIds)); } catch {}
+      }
+    }
   } catch {} // offline or rate limited: the personal stats above still count on this device
   pulse();
 }
@@ -1150,7 +1442,13 @@ function playApplause() {
 function render() {
   // New day: reset the daily stats. Checked on every render, so an app left open overnight resets too.
   const day = new Date().toDateString();
-  if (me.day !== day) { me = { ...me, day, trips: [], bestHold: 0, water: 0, waterLog: [] }; save(); }
+  if (me.day !== day) {
+    if (me.lastPoopAt) {
+      me.constipationDays = Math.max(0, Math.floor((Date.now() - me.lastPoopAt) / (24 * 3600 * 1000)));
+    }
+    me = { ...me, day, trips: [], bestHold: 0, water: 0, waterLog: [], poopLog: [], remedies: [], battleStart: null };
+    save();
+  }
   const holding = me.holdingSince !== null;
   const live = n => n === null ? '–' : num(n.toLocaleString('en'));
   setNum('inToilet', live(world.inToilet));
@@ -1198,19 +1496,130 @@ function render() {
   const dur = ms => ms >= MIN ? fmtMin(ms) : '–'; // under a minute is noise, not a stat
   $('sGap').textContent = gap === null ? '–' : dur(gap);
   $('sBest').textContent = dur(me.bestHold);
+  renderPoop();
+}
+
+const REMEDY_DATA = {
+  water: { titleKey: 'remWaterTitle', benefitKey: 'remWaterBenefit', howKey: 'remWaterHow' },
+  olive: { titleKey: 'remOliveTitle', benefitKey: 'remOliveBenefit', howKey: 'remOliveHow' },
+  flixweed: { titleKey: 'remFlixweedTitle', benefitKey: 'remFlixweedBenefit', howKey: 'remFlixweedHow' },
+  figs: { titleKey: 'remFigsTitle', benefitKey: 'remFigsBenefit', howKey: 'remFigsHow' },
+  squat: { titleKey: 'remSquatTitle', benefitKey: 'remSquatBenefit', howKey: 'remSquatHow' },
+  kiwi: { titleKey: 'remKiwiTitle', benefitKey: 'remKiwiBenefit', howKey: 'remKiwiHow' },
+  walk: { titleKey: 'remWalkTitle', benefitKey: 'remWalkBenefit', howKey: 'remWalkHow' },
+  coffee: { titleKey: 'remCoffeeTitle', benefitKey: 'remCoffeeBenefit', howKey: 'remCoffeeHow' },
+};
+let selectedRemedy = 'water';
+
+function renderInspector() {
+  const data = REMEDY_DATA[selectedRemedy] || REMEDY_DATA.water;
+  $('inspectorTitle').textContent = t[data.titleKey];
+  $('inspectorBenefit').textContent = t[data.benefitKey];
+  $('inspectorHow').textContent = t[data.howKey];
+
+  const isDone = (me.remedies ?? []).includes(selectedRemedy);
+  const btn = $('inspectorActionBtn');
+  btn.textContent = isDone ? t.remedyDone : t.remedyNotDone;
+  btn.classList.toggle('checked', isDone);
+
+  document.querySelectorAll('.remedy-tab').forEach(tab => {
+    const key = tab.dataset.remedy;
+    tab.classList.toggle('active', key === selectedRemedy);
+    tab.classList.toggle('done', (me.remedies ?? []).includes(key));
+  });
+}
+
+function renderPoop() {
+  const daysSince = me.lastPoopAt
+    ? Math.floor((Date.now() - me.lastPoopAt) / (24 * 3600 * 1000))
+    : (me.constipationDays ?? 0);
+  
+  const todayPoops = (me.poopLog ?? []).filter(p => p.result !== 'failed');
+  const badge = $('poopStatusBadge');
+  const daysText = $('poopDaysText');
+  const lastText = $('poopLastText');
+
+  if (todayPoops.length > 0) {
+    badge.className = 'badge good';
+    badge.textContent = t.poopStatusClean;
+    daysText.textContent = t.poopDays(num(0));
+  } else if (daysSince === 0 || daysSince === 1) {
+    badge.className = 'badge';
+    badge.textContent = t.poopStatus1;
+    daysText.textContent = t.poopDays(num(1));
+  } else if (daysSince === 2) {
+    badge.className = 'badge money';
+    badge.textContent = t.poopStatus2;
+    daysText.textContent = t.poopDays(num(2));
+  } else {
+    badge.className = 'badge bad';
+    badge.textContent = t.poopStatus3;
+    daysText.textContent = t.poopDays(num(Math.max(3, daysSince)));
+  }
+
+  if (me.lastPoopAt) {
+    const d = new Date(me.lastPoopAt);
+    lastText.textContent = t.poopLast(d.toLocaleDateString(lang === 'fa' ? 'fa-IR' : 'en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' }));
+  } else {
+    lastText.textContent = t.poopNever;
+  }
+
+  renderInspector();
+
+  const inBattle = typeof me.battleStart === 'number';
+  $('battleTimerWrap').hidden = !inBattle;
+  $('battleStartBtn').hidden = inBattle;
+  if (inBattle) {
+    const s = Math.floor((Date.now() - me.battleStart) / 1000);
+    const m = Math.floor(s / 60);
+    $('battleTimer').textContent = `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    $('battleWarn').hidden = m < 10;
+  }
+}
+
+function logBowelMovement(result, durationMins = 0) {
+  try {
+    me.poopLog = [...(me.poopLog ?? []), { at: Date.now(), result, durationMins }];
+    if (result !== 'failed') {
+      me.lastPoopAt = Date.now();
+      me.constipationDays = 0;
+      save();
+      publish('go', durationMins, true);
+      splash($('poopOpenLogBtn') || document.body);
+      releaseBalloons();
+      playApplause();
+      toast(t.poopToastSuccess);
+    } else {
+      me.constipationDays = (me.constipationDays ?? 0) + 1;
+      save();
+      toast(t.poopToastFailed);
+    }
+    render();
+  } catch (err) {
+    console.error('logBowelMovement error:', err);
+  }
 }
 
 $('holdBtn').onclick = () => {
-  me.holdingSince = Date.now();
-  save(); publish('hold'); render(); toast(t.toastHold);
+  try {
+    me.holdingSince = Date.now();
+    save(); publish('hold'); render(); toast(t.toastHold);
+  } catch (err) {
+    console.error('holdBtn error:', err);
+  }
 };
 $('goBtn').onclick = () => {
-  const held = me.holdingSince ? Date.now() - me.holdingSince : 0;
-  me.bestHold = Math.max(me.bestHold, held);
-  me.holdingSince = null;
-  me.trips.push(Date.now());
-  save(); publish('go', Math.floor(held / MIN)); render(); toast(t.toastGo(num(me.trips.length)));
-  splash($('goBtn')); releaseBalloons(); playApplause();
+  try {
+    const held = me.holdingSince ? Date.now() - me.holdingSince : 0;
+    me.bestHold = Math.max(me.bestHold ?? 0, held);
+    me.holdingSince = null;
+    if (!Array.isArray(me.trips)) me.trips = [];
+    me.trips.push(Date.now());
+    save(); publish('go', Math.floor(held / MIN)); render(); toast(t.toastGo(num(me.trips.length)));
+    splash($('goBtn')); releaseBalloons(); playApplause();
+  } catch (err) {
+    console.error('goBtn error:', err);
+  }
 };
 function addWater(cups) {
   me.waterLog = [...(me.waterLog ?? []), { ml: cups * 250, at: Date.now() }];
@@ -1239,6 +1648,75 @@ $('remind').onchange = e => {
   save(); render();
   // Ask for permission only after the user opts in, never on page load.
   if (me.remind && window.Notification?.permission === 'default') Notification.requestPermission();
+};
+
+$('poopOpen').onclick = () => {
+  $('poopWin').classList.remove('shut');
+  $('poopWin').scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+$('poopQuickBtn').onclick = () => {
+  $('poopWin').classList.remove('shut');
+  $('poopWin').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('poopLogDetails').open = true;
+};
+
+$('poopStuckBtn').onclick = () => {
+  me.constipationDays = (me.constipationDays ?? 0) + 1;
+  save();
+  render();
+  toast(t.poopToastStuck);
+};
+
+$('poopOpenLogBtn').onclick = () => {
+  $('poopLogDetails').open = !$('poopLogDetails').open;
+  if ($('poopLogDetails').open) $('poopLogDetails').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+};
+
+document.querySelectorAll('.poop-type-btn').forEach(btn => {
+  btn.onclick = () => {
+    const res = btn.dataset.result;
+    logBowelMovement(res, 0);
+    $('poopLogDetails').open = false;
+  };
+});
+
+$('battleStartBtn').onclick = () => {
+  me.battleStart = Date.now();
+  save();
+  render();
+};
+
+$('battleEndBtn').onclick = () => {
+  const durationMins = me.battleStart ? Math.max(1, Math.round((Date.now() - me.battleStart) / MIN)) : 0;
+  me.battleStart = null;
+  logBowelMovement('smooth', durationMins);
+};
+
+$('battleRetreatBtn').onclick = () => {
+  const durationMins = me.battleStart ? Math.max(1, Math.round((Date.now() - me.battleStart) / MIN)) : 0;
+  me.battleStart = null;
+  logBowelMovement('failed', durationMins);
+};
+
+document.querySelectorAll('.remedy-tab').forEach(tab => {
+  tab.onclick = () => {
+    selectedRemedy = tab.dataset.remedy;
+    renderInspector();
+  };
+});
+
+$('inspectorActionBtn').onclick = () => {
+  const list = me.remedies ?? [];
+  const title = t[REMEDY_DATA[selectedRemedy]?.titleKey || 'remWaterTitle'];
+  if (list.includes(selectedRemedy)) {
+    me.remedies = list.filter(k => k !== selectedRemedy);
+  } else {
+    me.remedies = [...list, selectedRemedy];
+    toast(t.remedyToast(title));
+  }
+  save();
+  render();
 };
 
 $('feedbackSend').onclick = async () => {
@@ -1293,20 +1771,30 @@ function clearCertificateTimers() {
 }
 function certificateRuling() {
   const trips = me.trips.length;
+  const poopSuccess = (me.poopLog ?? []).filter(p => p.result !== 'failed').length;
+  const daysSincePoop = me.lastPoopAt
+    ? Math.floor((Date.now() - me.lastPoopAt) / (24 * 3600 * 1000))
+    : (me.constipationDays ?? 0);
+
   if (me.holdingSince) return { stamp: t.certStampHolding, verdict: t.certVerdictHolding(fmtMin(Date.now() - me.holdingSince)) };
-  if (!trips) return { stamp: t.certStampNone, verdict: t.certVerdictNone };
+  if (daysSincePoop >= 2) return { stamp: t.certStampConstipated, verdict: t.certVerdictConstipated(num(daysSincePoop)) };
+  if ((me.poopLog ?? []).some(p => p.result === 'struggle')) return { stamp: t.certStampBowelBattle, verdict: t.certVerdictBowelBattle };
+  if (poopSuccess >= 1 && (me.poopLog ?? []).some(p => p.result === 'smooth')) return { stamp: t.certStampBowelSmooth, verdict: t.certVerdictBowelSmooth };
+  if (!trips && !poopSuccess) return { stamp: t.certStampNone, verdict: t.certVerdictNone };
   if (me.bestHold >= 45 * MIN) return { stamp: t.certStampLong, verdict: t.certVerdictLong(fmtMin(me.bestHold)) };
   if (trips >= 5) return { stamp: t.certStampBusy, verdict: t.certVerdictBusy(num(trips)) };
   return { stamp: t.certStamp, verdict: t.certVerdictRelieved(num(trips)) };
 }
 function openCertificate() {
   const waterCups = (me.waterLog ?? []).reduce((sum, entry) => sum + entry.ml, 0) / 250;
+  const poopSuccess = (me.poopLog ?? []).filter(p => p.result !== 'failed').length;
   const caseId = `${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${session.slice(-4).toUpperCase()}`;
   const ruling = certificateRuling();
   $('certCase').textContent = t.certCase(caseId);
   $('certVerdict').textContent = ruling.verdict;
   $('certStamp').textContent = ruling.stamp;
   $('certTrips').textContent = num(me.trips.length);
+  $('certPoop').textContent = num(poopSuccess);
   $('certHold').textContent = me.bestHold >= MIN ? fmtMin(me.bestHold) : '–';
   $('certWater').textContent = num(waterCups);
   $('certStatus').textContent = '';
@@ -1332,8 +1820,8 @@ async function certificateImage() {
   if (document.fonts) {
     // Include the actual text so unicode-range subsets (including Persian digits) load too.
     const sample = [$('certCase').textContent, $('certVerdict').textContent,
-      $('certTrips').textContent, $('certHold').textContent, $('certWater').textContent,
-      $('certStamp').textContent, t.certCourt, t.certTitle, t.certTripsLabel,
+      $('certTrips').textContent, $('certPoop').textContent, $('certHold').textContent, $('certWater').textContent,
+      $('certStamp').textContent, t.certCourt, t.certTitle, t.certTripsLabel, t.certPoopLabel,
       t.certHoldLabel, t.certWaterLabel, t.certFooter,
       new Date().toLocaleDateString(lang === 'fa' ? 'fa-IR' : 'en-GB')].join(' ');
     await Promise.all([400, 500, 700, 800].map(weight =>
@@ -1349,8 +1837,8 @@ async function certificateImage() {
   for (let y = 90; y < 1300; y += 42) { c.beginPath(); c.moveTo(54, y); c.lineTo(1026, y); c.stroke(); }
   const center = 540;
   c.textAlign = 'center'; c.fillStyle = '#2a1a4a';
-  c.font = `700 30px ${font}`; c.fillText(t.certCourt, center, 125);
-  c.font = `800 55px ${font}`; c.fillText(t.certTitle, center, 205);
+  c.font = `700 27px ${font}`; c.fillText(t.certCourt, center, 125);
+  c.font = `800 52px ${font}`; c.fillText(t.certTitle, center, 205);
   c.font = `400 24px ${font}`; c.fillText($('certCase').textContent, center, 255);
   function wrapped(text, x, y, maxWidth, lineHeight) {
     const words = text.split(' '), lines = []; let line = '';
@@ -1364,11 +1852,11 @@ async function certificateImage() {
   c.strokeStyle = '#2a1a4a'; c.lineWidth = 2; c.beginPath(); c.moveTo(120, 300); c.lineTo(960, 300); c.stroke();
   c.font = `700 32px ${font}`; wrapped($('certVerdict').textContent, center, 355, 800, 52);
   c.beginPath(); c.moveTo(120, 490); c.lineTo(960, 490); c.stroke();
-  const statX = [260, 540, 820], statValue = [$('certTrips').textContent, $('certHold').textContent, $('certWater').textContent];
-  const statLabel = [t.certTripsLabel, t.certHoldLabel, t.certWaterLabel];
-  for (let i = 0; i < 3; i++) {
-    c.font = `800 52px ${font}`; c.fillText(statValue[i], statX[i], 590);
-    c.font = `500 24px ${font}`; c.fillText(statLabel[i], statX[i], 635);
+  const statX = [180, 420, 660, 900], statValue = [$('certTrips').textContent, $('certPoop').textContent, $('certHold').textContent, $('certWater').textContent];
+  const statLabel = [t.certTripsLabel, t.certPoopLabel, t.certHoldLabel, t.certWaterLabel];
+  for (let i = 0; i < 4; i++) {
+    c.font = `800 46px ${font}`; c.fillText(statValue[i], statX[i], 590);
+    c.font = `500 20px ${font}`; c.fillText(statLabel[i], statX[i], 635);
   }
   c.save(); c.translate(center, 850); c.rotate(-13 * Math.PI / 180);
   c.strokeStyle = '#ba2636'; c.fillStyle = '#ba2636'; c.lineWidth = 9; c.beginPath(); c.arc(0, 0, 145, 0, Math.PI * 2); c.stroke();
