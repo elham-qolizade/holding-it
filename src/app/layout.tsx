@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
@@ -29,21 +30,12 @@ export const metadata: Metadata = {
     title: "Holding It — The World's Live Bladder & Bowel Bureau",
     description:
       'Track holding it live with strangers worldwide, battle constipation in the trenches, and get your official court ruling certificate.',
-    images: [
-      {
-        url: '/icon-512.png',
-        width: 512,
-        height: 512,
-        alt: 'Holding It',
-      },
-    ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: "Holding It — The World's Live Bladder & Bowel Bureau",
     description:
       'Track holding it live with strangers worldwide, battle constipation in the trenches, and get your official court ruling certificate.',
-    images: ['/icon-512.png'],
   },
 };
 
@@ -66,7 +58,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

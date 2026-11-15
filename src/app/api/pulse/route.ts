@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
+import { SUPABASE_URL, SUPABASE_KEY } from '@/lib/config';
 
 export const runtime = 'edge';
 export const revalidate = 5;
 
-const SUPABASE_PULSE_URL = 'https://qpaastiurmstbmzcjcvo.supabase.co/rest/v1/rpc/pulse';
-const SUPABASE_KEY = 'sb_publishable_rGOhLBbGZ7ET96mKtJKfGQ_U_wiXuTB';
+const SUPABASE_PULSE_URL = `${SUPABASE_URL}/rest/v1/rpc/pulse`;
 
 export async function GET() {
   try {
@@ -31,9 +31,9 @@ export async function GET() {
         'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=10',
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: err.message || 'Internal Server Error' },
+      { error: err instanceof Error ? err.message : 'Internal Server Error' },
       { status: 500 }
     );
   }

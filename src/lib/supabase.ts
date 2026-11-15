@@ -1,7 +1,8 @@
 import { FeedItem, NewsData } from '@/types';
+import { SUPABASE_URL, SUPABASE_KEY } from '@/lib/config';
 
-const API = 'https://qpaastiurmstbmzcjcvo.supabase.co/rest/v1/rpc/';
-const API_KEY = 'sb_publishable_rGOhLBbGZ7ET96mKtJKfGQ_U_wiXuTB';
+const API = `${SUPABASE_URL}/rest/v1/rpc/`;
+const API_KEY = SUPABASE_KEY;
 
 export async function rpc<T = any>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const res = await fetch(API + fn, {
@@ -29,15 +30,10 @@ export interface PulseResponse {
 }
 
 export async function fetchPulse(): Promise<PulseResponse> {
-  if (typeof window !== 'undefined') {
-    try {
-      const res = await fetch('/api/pulse');
-      if (res.ok) {
-        return (await res.json()) as PulseResponse;
-      }
-    } catch {}
-  }
-  return rpc<PulseResponse>('pulse');
+  // Goes through the edge-cached /api/pulse so traffic spikes hit Supabase once per few seconds.
+  const res = await fetch('/api/pulse');
+  if (!res.ok) throw new Error(`pulse: ${res.status}`);
+  return (await res.json()) as PulseResponse;
 }
 
 export async function logEvent(params: {
