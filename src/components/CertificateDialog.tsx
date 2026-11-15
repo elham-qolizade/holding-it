@@ -115,6 +115,18 @@ export const CertificateDialog: React.FC<CertificateDialogProps> = ({
     setIsGenerating(false);
   };
 
+  const handleShareOnX = () => {
+    const verdictClean = ruling.verdict.replace(/\s+/g, ' ').trim();
+    const stampClean = ruling.stamp.replace(/\n/g, ' ').trim();
+    const text =
+      lang === 'fa'
+        ? `⚖️ حکم رسمی دادگاه عالی امور مثانه و روده:\n«${verdictClean}»\nتمبر: [${stampClean}]\n#HoldingIt`
+        : `⚖️ Official Supreme Court of Bladder & Bowel Affairs verdict:\n"${verdictClean}"\n\nOfficial Stamp: [${stampClean}]\n#HoldingIt`;
+    const url = typeof window !== 'undefined' ? window.location.origin : 'https://holding-it.vercel.app';
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div id="certificateDialog" onClick={onClose} role="dialog" aria-modal="true">
       <article
@@ -165,7 +177,16 @@ export const CertificateDialog: React.FC<CertificateDialogProps> = ({
             disabled={isGenerating}
             onClick={handleShare}
           >
-            {t.certShare}
+            💾 {t.certShare}
+          </button>
+          <button
+            id="certTwitter"
+            className="btn twitter-btn"
+            type="button"
+            onClick={handleShareOnX}
+            title={lang === 'fa' ? 'اشتراک در توییتر' : 'Post verdict on X'}
+          >
+            𝕏 {lang === 'fa' ? 'توییت حکم' : 'Post on X'}
           </button>
           <button
             id="certClose"

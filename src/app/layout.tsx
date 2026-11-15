@@ -8,8 +8,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'نگه داشتم — زنده',
-  description: 'ثبت زنده‌ی مأموریت‌های دستشویی، آمار روزانه و پیدا کردن دستشویی نزدیک؛ بدون ثبت‌نام.',
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://holding-it.vercel.app'
+  ),
+  title: "Holding It — The World's Live Bladder & Bowel Bureau",
+  description:
+    'Track holding it live with strangers worldwide, battle constipation in the trenches, and get your official court ruling certificate. No signups, 100% free.',
   manifest: '/manifest.webmanifest',
   icons: {
     icon: '/icon-192.png',
@@ -17,16 +21,29 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'نگه داشتم',
+    title: 'Holding It',
     statusBarStyle: 'default',
   },
   openGraph: {
     type: 'website',
-    title: 'نگه داشتم — دادگاه عالی امور مثانه و روده',
-    description: 'مأموریت‌های سبک، سنگین و نبردهای یبوست را ثبت کن و حکم رسمی مثانه و روده‌ات را بگیر.',
+    title: "Holding It — The World's Live Bladder & Bowel Bureau",
+    description:
+      'Track holding it live with strangers worldwide, battle constipation in the trenches, and get your official court ruling certificate.',
+    images: [
+      {
+        url: '/icon-512.png',
+        width: 512,
+        height: 512,
+        alt: 'Holding It',
+      },
+    ],
   },
   twitter: {
     card: 'summary',
+    title: "Holding It — The World's Live Bladder & Bowel Bureau",
+    description:
+      'Track holding it live with strangers worldwide, battle constipation in the trenches, and get your official court ruling certificate.',
+    images: ['/icon-512.png'],
   },
 };
 
@@ -36,7 +53,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="en" dir="ltr">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

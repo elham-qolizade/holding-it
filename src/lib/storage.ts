@@ -112,12 +112,12 @@ export function saveMyIds(ids: number[]): void {
 }
 
 export function getStoredLang(): Lang {
-  if (typeof window === 'undefined') return 'fa';
+  if (typeof window === 'undefined') return 'en';
   try {
     const l = localStorage.getItem('holdingit-lang');
     if (l === 'en' || l === 'fa') return l;
   } catch {}
-  return 'fa';
+  return 'en';
 }
 
 export function setStoredLang(lang: Lang): void {

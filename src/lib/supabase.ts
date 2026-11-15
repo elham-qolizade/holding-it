@@ -29,6 +29,14 @@ export interface PulseResponse {
 }
 
 export async function fetchPulse(): Promise<PulseResponse> {
+  if (typeof window !== 'undefined') {
+    try {
+      const res = await fetch('/api/pulse');
+      if (res.ok) {
+        return (await res.json()) as PulseResponse;
+      }
+    } catch {}
+  }
   return rpc<PulseResponse>('pulse');
 }
 

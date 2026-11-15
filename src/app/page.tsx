@@ -38,7 +38,7 @@ import { fetchPulse, logEvent, fetchNews } from '@/lib/supabase';
 const NUDGE_AFTER = 180 * MIN; // 3 hours
 
 export default function Home() {
-  const [lang, setLang] = useState<Lang>('fa');
+  const [lang, setLang] = useState<Lang>('en');
   const [session, setSession] = useState<string>('');
   const [myIds, setMyIds] = useState<number[]>([]);
   const [state, setState] = useState<PersonalState>(DEFAULT_STATE);

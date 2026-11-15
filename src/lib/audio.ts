@@ -56,3 +56,33 @@ export function playGavel(): void {
     }, 500);
   } catch {}
 }
+
+export function playHoldTick(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.08);
+
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.09);
+
+    setTimeout(() => {
+      ctx.close().catch(() => {});
+    }, 250);
+  } catch {}
+}

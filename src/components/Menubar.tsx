@@ -48,8 +48,8 @@ export const Menubar: React.FC<MenubarProps> = ({ lang, onToggleLang, onOpenSos 
       <span className="logo">
         <PixelIcon name="toilet" />
       </span>
-      <button type="button" onClick={onToggleLang}>
-        {t.switchTo}
+      <button type="button" onClick={onToggleLang} className="lang-btn" title="Language / تغییر زبان">
+        🌐 <span>{t.switchTo}</span>
       </button>
       {installPrompt && (
         <button type="button" onClick={handleInstall}>

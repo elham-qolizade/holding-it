@@ -99,7 +99,7 @@ export const DayStats: React.FC<DayStatsProps> = ({
         <button
           id="shareBtn"
           type="button"
-          className="btn small"
+          className="btn cert-btn"
           onClick={onOpenCertificate}
         >
           <span>{t.share}</span>

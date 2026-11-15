@@ -5,7 +5,7 @@ import { PixelIcon } from './PixelIcon';
 import { Lang } from '@/types';
 import { dictionaries } from '@/lib/i18n';
 import { splash, releaseBalloons } from '@/lib/fx';
-import { playApplause } from '@/lib/audio';
+import { playApplause, playHoldTick } from '@/lib/audio';
 
 interface ActionButtonsProps {
   name: string;
@@ -29,10 +29,25 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const t = dictionaries[lang];
   const goBtnRef = useRef<HTMLButtonElement>(null);
 
+  const handleHoldClick = () => {
+    playHoldTick();
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(30);
+      } catch {}
+    }
+    onHold();
+  };
+
   const handleGoClick = () => {
     splash(goBtnRef.current);
     releaseBalloons();
     playApplause();
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate([40, 50, 40]);
+      } catch {}
+    }
     onGo();
   };
 
@@ -57,7 +72,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           type="button"
           className="btn"
           disabled={isHolding}
-          onClick={onHold}
+          onClick={handleHoldClick}
         >
           <PixelIcon name="hourglass" />
           <span>{isHolding ? t.holdingNow : t.hold}</span>

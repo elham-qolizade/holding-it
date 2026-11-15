@@ -91,7 +91,7 @@ export const en = {
   poopToastSuccess: 'Bowel mission filed in the archives.',
   poopToastStuck: 'Blockage recorded. Immediate warm water and fiber mandated.',
   poopToastFailed: 'Tactical retreat documented. Drink water and try later.',
-  share: 'Share my day',
+  share: '📜 Get Official Court Certificate',
   copied: 'Copied!',
   feedTitle: 'Live feed',
   certCourt: 'Supreme Court of Bladder & Bowel Affairs',

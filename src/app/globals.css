@@ -376,7 +376,27 @@ button {
 }
 
 #shareBtn {
-  background: var(--lilac);
+  background: #fdf2cd;
+  border: 2px solid #825e1a;
+  color: #3b2500;
+  font-weight: 700;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 12px;
+  box-shadow: 3px 3px 0 #825e1a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+#shareBtn:hover:not(:disabled) {
+  background: #fae7a0;
+  filter: brightness(1.05);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #825e1a;
 }
 
 #poopQuickBtn {
@@ -1470,22 +1490,43 @@ button:focus-visible {
 
 .cert-actions {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .cert-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+  #certClose {
+    grid-column: span 2;
+  }
 }
 
 .cert-actions .btn {
-  min-height: 50px;
+  min-height: 48px;
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  padding: 6px 10px;
 }
 
 #certShare {
   background: var(--lilac);
 }
 
+#certTwitter {
+  background: #18181b;
+  color: #fafafa;
+  border: 2px solid #09090b;
+}
+
+#certTwitter:hover {
+  background: #27272a;
+  color: #fff;
+}
+
 #certClose {
-  min-width: 54px;
+  min-width: 50px;
 }
 
 #certStatus {
