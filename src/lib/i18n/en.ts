@@ -29,7 +29,7 @@ export const en = {
   waterLast: (n: string, time: string) => `${n} water stop${n === '1' ? '' : 's'} · last at ${time}`,
   waterDone: 'Goal reached. Your bladder has been notified. 🚨',
   poopShort: 'Bowel & Poop',
-  poopQuick: 'Bowel Mission',
+  poopQuick: 'Evacuation',
   poopTitle: 'Bowel Affairs & Constipation Bureau',
   poopStatusClean: 'Relieved & Clear 🟢',
   poopStatus1: '1-day pause',

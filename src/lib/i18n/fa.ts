@@ -29,7 +29,7 @@ export const fa = {
   waterLast: (n: string, time: string) => `${n} نوبت آب خوردی · آخری ساعت ${time}`,
   waterDone: 'هدف پر شد؛ مثانه در جریان قرار گرفت! 🚨',
   poopShort: 'یبوست و روده',
-  poopQuick: 'مأموریت سنگین',
+  poopQuick: 'تخلیه',
   poopTitle: 'دیوان امور روده و ستاد مقابله با یبوست',
   poopStatusClean: 'تخلیه موفق و روان 🟢',
   poopStatus1: '۱ روز وقفه',
