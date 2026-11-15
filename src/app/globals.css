@@ -158,6 +158,7 @@ h1 .hl {
   border-radius: 3px;
   box-shadow: 2px 2px 0 var(--ink);
   overflow: hidden;
+  scroll-margin-top: 16px;
 }
 
 .win h2 {

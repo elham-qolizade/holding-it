@@ -340,6 +340,26 @@ export default function Home() {
     updateState(prev => ({ ...prev, name }));
   };
 
+  const scrollToWindow = useCallback((elementId: string) => {
+    setTimeout(() => {
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 60);
+  }, []);
+
+  const handleOpenSos = useCallback(() => {
+    setSosOpen(true);
+    scrollToWindow('sos');
+  }, [scrollToWindow]);
+
+  const handleOpenPoop = useCallback(() => {
+    setPoopOpen(true);
+    setPoopDetailsOpen(true);
+    scrollToWindow('poopWin');
+  }, [scrollToWindow]);
+
   // Nudge overdue condition
   const since = Math.max(state.trips[state.trips.length - 1] ?? 0, state.remindOn ?? 0);
   const isOverdue = !!state.remind && Date.now() - since > NUDGE_AFTER;
@@ -349,7 +369,7 @@ export default function Home() {
       <Menubar
         lang={lang}
         onToggleLang={handleToggleLang}
-        onOpenSos={() => setSosOpen(true)}
+        onOpenSos={handleOpenSos}
       />
 
       <main>
@@ -369,10 +389,7 @@ export default function Home() {
           isHolding={state.holdingSince !== null}
           onHold={handleHold}
           onGo={handleGo}
-          onOpenPoop={() => {
-            setPoopOpen(true);
-            setPoopDetailsOpen(true);
-          }}
+          onOpenPoop={handleOpenPoop}
           lang={lang}
         />
 
