@@ -15,6 +15,11 @@ export const metadata: Metadata = {
     icon: '/icon-192.png',
     apple: '/icon-180.png',
   },
+  appleWebApp: {
+    capable: true,
+    title: 'نگه داشتم',
+    statusBarStyle: 'default',
+  },
   openGraph: {
     type: 'website',
     title: 'نگه داشتم — دادگاه عالی امور مثانه و روده',
