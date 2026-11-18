@@ -10,7 +10,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://holding-it.vercel.app'
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://holding-it-two.vercel.app'
   ),
   title: "Holding It — The World's Live Bladder & Bowel Bureau",
   description:
